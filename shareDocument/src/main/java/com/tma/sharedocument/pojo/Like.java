@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(
-    name = "like", 
+    name = "likes", 
     uniqueConstraints = {
         @UniqueConstraint(columnNames = {"user_id", "document_id"})
     }

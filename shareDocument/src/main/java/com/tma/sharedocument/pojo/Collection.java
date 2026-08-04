@@ -10,7 +10,7 @@ package com.tma.sharedocument.pojo;
  */
 import jakarta.persistence.*;
 import lombok.*;
-import java.time.LocalDateTime;
+import java.util.Set;
 
 @Entity
 @Table(name = "collection")
@@ -18,6 +18,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Collection {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -29,6 +30,11 @@ public class Collection {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(name = "created_at")
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @ManyToMany
+    @JoinTable(
+            name = "collection_documents",
+            joinColumns = @JoinColumn(name = "collection_id"),
+            inverseJoinColumns = @JoinColumn(name = "document_id")
+    )
+    private Set<Document> documents;
 }

@@ -4,15 +4,21 @@
  */
 package com.tma.sharedocument.dto;
 
-import lombok.Data;
-
 /**
  *
  * @author Minh Anh
  */
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 @Data
-public class CollectionDto {
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class CategoryResponseDto {
+
     private Long id;
     private String name;
-    private UserResponseDto user;
 }

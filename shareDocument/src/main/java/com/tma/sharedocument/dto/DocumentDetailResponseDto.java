@@ -4,14 +4,10 @@
  */
 package com.tma.sharedocument.dto;
 
-import lombok.Data;
-
 /**
  *
  * @author Minh Anh
  */
-@Data
-public class CateDto {
-    private Long id;
-    private String name;
+public class DocumentDetailResponseDto {
+    
 }

@@ -4,23 +4,44 @@
  */
 package com.tma.sharedocument.dto;
 
-import com.tma.sharedocument.enums.UserRole;
-import lombok.Data;
-import org.springframework.web.multipart.MultipartFile;
-
 /**
  *
  * @author Minh Anh
  */
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class UserRequestDto {
-    private Long id;
+
+    @NotBlank(message = "Họ không được để trống")
+    @Size(max = 50)
     private String ho;
+
+    @NotBlank(message = "Tên không được để trống")
+    @Size(max = 50)
     private String ten;
-    private MultipartFile avatar;
+
+    @NotBlank(message = "Username không được để trống")
+    @Size(max = 50)
     private String username;
+
+    @NotBlank(message = "Password không được để trống")
+    @Size(min = 6, message = "Password phải có ít nhất 6 ký tự")
     private String password;
+
+    @NotBlank(message = "Email không được để trống")
+    @Email(message = "Email không hợp lệ")
+    @Size(max = 100)
     private String email;
-    private UserRole userRole;
-    private Boolean status;
+
+    private String avatar;
 }

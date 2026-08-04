@@ -9,6 +9,7 @@ package com.tma.sharedocument.pojo;
  * @author Minh Anh
  */
 import jakarta.persistence.*;
+import java.util.Set;
 import lombok.*;
 
 @Entity
@@ -17,10 +18,16 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Tag {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false, unique = true, length = 50)
     private String name;
+
+    @ManyToMany(mappedBy = "tags")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private Set<Document> documents;
 }

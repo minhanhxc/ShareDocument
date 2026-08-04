@@ -9,6 +9,7 @@ package com.tma.sharedocument.dto;
  * @author Minh Anh
  */
 import java.time.LocalDateTime;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,15 +20,18 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserResponseDto {
+public class DocumentResponseDto {
 
     private Long id;
-    private String ho;
-    private String ten;
-    private String username;
-    private String email;
-    private String avatar;
-    private String userRole;
-    private Boolean status;
+    private String title;
+
+    private Long uploaderId;
+    private String uploaderName;
+
+    private List<String> tagNames;
+
+    private Long viewCount;
+    private Long likeCount;
+
     private LocalDateTime createdAt;
 }

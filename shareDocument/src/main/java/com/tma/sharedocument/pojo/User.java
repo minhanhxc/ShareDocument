@@ -12,6 +12,7 @@ import com.tma.sharedocument.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Entity
 @Table(name = "user")
@@ -19,6 +20,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -28,10 +30,10 @@ public class User {
 
     @Column(name = "ten", length = 50)
     private String ten;
-    
-    @Column (name = "avatar", length = 255)
+
+    @Column(name = "avatar", length = 255)
     private String avatar;
-    
+
     @Column(unique = true, nullable = false, length = 50)
     private String username;
 
@@ -41,6 +43,7 @@ public class User {
     @Column(unique = true, nullable = false, length = 100)
     private String email;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "user_role", length = 20)
     private UserRole userRole;
 
@@ -48,4 +51,9 @@ public class User {
 
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    @OneToMany(mappedBy = "user")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private Set<Document> documents;
 }
