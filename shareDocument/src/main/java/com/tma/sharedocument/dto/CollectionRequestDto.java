@@ -8,8 +8,8 @@ package com.tma.sharedocument.dto;
  *
  * @author Minh Anh
  */
-import java.time.LocalDateTime;
-
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,15 +19,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserResponseDto {
+public class CollectionRequestDto {
 
-    private Long id;
-    private String ho;
-    private String ten;
-    private String username;
-    private String email;
-    private String avatar;
-    private String userRole;
-    private Boolean status;
-    private LocalDateTime createdAt;
+    @NotBlank(message = "Tên bộ sưu tập không được để trống")
+    @Size(max = 100)
+    private String name;
 }

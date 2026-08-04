@@ -19,15 +19,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserResponseDto {
+public class CommentResponseDto {
 
     private Long id;
-    private String ho;
-    private String ten;
-    private String username;
-    private String email;
-    private String avatar;
-    private String userRole;
-    private Boolean status;
+    private String content;
+
+    private Long userId;
+    private String userName;
+    private String userAvatar;
+
+    private Long documentId;
+
     private LocalDateTime createdAt;
 }

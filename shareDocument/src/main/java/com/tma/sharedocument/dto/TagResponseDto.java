@@ -4,17 +4,21 @@
  */
 package com.tma.sharedocument.dto;
 
-import java.time.LocalDateTime;
-import lombok.Data;
-
 /**
  *
  * @author Minh Anh
  */
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 @Data
-public class CommentDto {
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class TagResponseDto {
+
     private Long id;
-    private String content;
-    private UserResponseDto user;
-    private LocalDateTime createAt;
+    private String name;
 }
