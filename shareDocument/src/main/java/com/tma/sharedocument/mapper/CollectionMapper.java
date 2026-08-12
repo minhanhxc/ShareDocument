@@ -18,11 +18,11 @@ import org.mapstruct.Mapping;
 public interface CollectionMapper {
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "user", ignore = true)
+    @Mapping(target = "userId", ignore = true)
     @Mapping(target = "documents", ignore = true)
     Collection toPojo(CollectionRequestDto c);
     
-    @Mapping(source = "user.id", target = "userId")
+    @Mapping(source = "userId.id", target = "userId")
     @Mapping(target  = "totalDocument", ignore = true)
     CollectionResponseDto toDto(Collection c);
 }

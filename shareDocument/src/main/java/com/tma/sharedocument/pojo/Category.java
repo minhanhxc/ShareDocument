@@ -9,12 +9,12 @@ package com.tma.sharedocument.pojo;
  * @author Minh Anh
  */
 import jakarta.persistence.*;
-import java.util.Set;
 import lombok.*;
 
 @Entity
 @Table(name = "category")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Category {
@@ -24,8 +24,5 @@ public class Category {
 
     @Column(nullable = false, unique = true, length = 100)
     private String name;
-    @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    private Set<Document> documents;
+    
 }

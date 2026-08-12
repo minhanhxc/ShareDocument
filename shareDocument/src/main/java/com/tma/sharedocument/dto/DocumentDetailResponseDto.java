@@ -9,5 +9,8 @@ package com.tma.sharedocument.dto;
  * @author Minh Anh
  */
 public class DocumentDetailResponseDto {
-    
+    private String description;
+    private String fileUrl;
+    private String fileType;
+
 }

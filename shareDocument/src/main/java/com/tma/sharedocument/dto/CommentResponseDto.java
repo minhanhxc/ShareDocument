@@ -25,10 +25,8 @@ public class CommentResponseDto {
     private String content;
 
     private Long userId;
-    private String userName;
-    private String userAvatar;
-
-    private Long documentId;
+    private String username;
+    private String avatar;
 
     private LocalDateTime createdAt;
 }

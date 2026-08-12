@@ -8,6 +8,7 @@ package com.tma.sharedocument.dto;
  *
  * @author Minh Anh
  */
+import com.tma.sharedocument.pojo.Category;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -29,6 +30,7 @@ public class DocumentResponseDto {
     private String uploaderName;
 
     private List<String> tagNames;
+    private Category category;
 
     private Long viewCount;
     private Long likeCount;

@@ -6,8 +6,8 @@ package com.tma.sharedocument.repository;
 
 import com.tma.sharedocument.pojo.Document;
 import java.util.List;
-import java.util.Map;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -15,11 +15,9 @@ import org.springframework.stereotype.Repository;
  * @author Minh Anh
  */
 @Repository
-public interface DocumentRepository extends JpaRepository<Document, Long>{
+public interface DocumentRepository extends JpaRepository<Document, Long>, 
+        JpaSpecificationExecutor<Document>{
     List<Document> findByCategoryId(Long categoryId);
     List<Document> findByUserId(Long userId);
 
-    List<Document> findByTitleContainingIgnoreCase(String keyword);
-
-    List<Document> findByTagsId(Long tagId);
 }
