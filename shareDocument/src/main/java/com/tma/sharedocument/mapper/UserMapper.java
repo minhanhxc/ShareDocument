@@ -19,7 +19,6 @@ public interface UserMapper {
     @Mapping(target = "userRole", ignore = true)
     @Mapping(target = "status", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "documents", ignore = true)
     User toPojo(UserRequestDto u);
 
     UserResponseDto toDto(User u);

@@ -9,12 +9,12 @@ package com.tma.sharedocument.pojo;
  * @author Minh Anh
  */
 import jakarta.persistence.*;
-import java.util.Set;
 import lombok.*;
 
 @Entity
 @Table(name = "tag")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Tag {
@@ -26,8 +26,4 @@ public class Tag {
     @Column(nullable = false, unique = true, length = 50)
     private String name;
 
-    @ManyToMany(mappedBy = "tags")
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    private Set<Document> documents;
 }

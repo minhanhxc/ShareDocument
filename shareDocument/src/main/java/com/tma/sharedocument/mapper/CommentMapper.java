@@ -17,14 +17,14 @@ import org.mapstruct.Mapping;
 @Mapper
 public interface CommentMapper {
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "user", ignore = true)      
-    @Mapping(target = "document", ignore = true)  
+    @Mapping(target = "userId", ignore = true)      
+    @Mapping(target = "documentId", ignore = true)  
     @Mapping(target = "createdAt", ignore = true)
     Comment toPojo(CommentRequestDto c);
     
-    @Mapping(source = "user.id", target = "userId")
-    @Mapping(source = "user.username", target = "userName")
-    @Mapping(source = "user.avatar", target = "userAvatar")
-    @Mapping(source = "document.id", target = "documentId")
+    @Mapping(source = "userId.id", target = "userId")
+    @Mapping(source = "userId.username", target = "username")
+    @Mapping(source = "userId.avatar", target = "avatar")
+
     CommentResponseDto toDto(Comment c);
 }

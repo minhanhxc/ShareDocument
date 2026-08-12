@@ -15,7 +15,8 @@ import java.util.Set;
 
 @Entity
 @Table(name = "document")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Document {
@@ -39,17 +40,13 @@ public class Document {
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    private User user;
+    private User userId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    private Category category;
+    private Category categoryId;
 
     @ManyToMany
     @JoinTable(
@@ -57,22 +54,10 @@ public class Document {
             joinColumns = @JoinColumn(name = "document_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_id")
     )
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
     private Set<Tag> tags;
 
-    @OneToMany(mappedBy = "document", cascade = CascadeType.ALL, orphanRemoval = true)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
+    @OneToMany(mappedBy = "documentId", cascade = CascadeType.ALL)
     private Set<Comment> comments;
 
-    @OneToMany(mappedBy = "document", cascade = CascadeType.ALL, orphanRemoval = true)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    private Set<Like> likes;
 
-    @OneToMany(mappedBy = "document", cascade = CascadeType.ALL, orphanRemoval = true)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    private Set<View> views;
 }

@@ -19,16 +19,15 @@ public interface DocumentMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "category", ignore = true)
-    @Mapping(target = "user", ignore = true)
+    @Mapping(target = "fileType", ignore = true)
+    @Mapping(target = "categoryId", ignore = true)
+    @Mapping(target = "userId", ignore = true)
     @Mapping(target = "tags", ignore = true)
     @Mapping(target = "comments", ignore = true)
-    @Mapping(target = "likes", ignore = true)
-    @Mapping(target = "views", ignore = true)
     Document toPojo(DocumentRequestDto requestDto);
 
-    @Mapping(source = "user.id", target = "uploaderId")
-    @Mapping(source = "user.username", target = "uploaderName")
+    @Mapping(source = "userId.id", target = "uploaderId")
+    @Mapping(source = "userId.username", target = "uploaderName")
     @Mapping(target = "tagNames", ignore = true)   
     @Mapping(target = "viewCount", ignore = true)  
     @Mapping(target = "likeCount", ignore = true)

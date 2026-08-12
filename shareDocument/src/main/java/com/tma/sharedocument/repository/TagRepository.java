@@ -5,7 +5,7 @@
 package com.tma.sharedocument.repository;
 
 import com.tma.sharedocument.pojo.Tag;
-import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
@@ -13,5 +13,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * @author Minh Anh
  */
 public interface TagRepository extends JpaRepository<Tag, Long>{
-    List<Tag> findByName(String name);
+    Optional<Tag> findByName(String name);
 }

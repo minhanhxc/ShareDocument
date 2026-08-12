@@ -14,7 +14,8 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "comment")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Comment {
@@ -25,13 +26,13 @@ public class Comment {
     @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    private User user;
+    private User userId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "document_id")
-    private Document document;
+    private Document documentId;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();

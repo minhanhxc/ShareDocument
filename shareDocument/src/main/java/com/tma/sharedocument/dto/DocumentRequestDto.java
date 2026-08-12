@@ -27,8 +27,6 @@ public class DocumentRequestDto {
     @NotBlank(message = "File URL không được để trống")
     private String fileUrl;
 
-    private String fileType;
-
     @NotNull(message = "Phải chọn danh mục")
     private Long categoryId;
 

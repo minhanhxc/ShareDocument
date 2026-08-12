@@ -14,7 +14,8 @@ import java.util.Set;
 
 @Entity
 @Table(name = "collection")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Collection {
@@ -26,9 +27,9 @@ public class Collection {
     @Column(nullable = false, length = 100)
     private String name;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    private User user;
+    private User userId;
 
     @ManyToMany
     @JoinTable(

@@ -12,7 +12,6 @@ import com.tma.sharedocument.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
-import java.util.Set;
 
 @Entity
 @Table(name = "user")
@@ -52,8 +51,4 @@ public class User {
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    @OneToMany(mappedBy = "user")
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    private Set<Document> documents;
 }
