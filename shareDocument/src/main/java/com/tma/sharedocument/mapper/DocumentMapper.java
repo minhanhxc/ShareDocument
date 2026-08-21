@@ -4,6 +4,7 @@
  */
 package com.tma.sharedocument.mapper;
 
+import com.tma.sharedocument.dto.DocumentDetailResponseDto;
 import com.tma.sharedocument.dto.DocumentRequestDto;
 import com.tma.sharedocument.dto.DocumentResponseDto;
 import com.tma.sharedocument.pojo.Document;
@@ -14,22 +15,29 @@ import org.mapstruct.Mapping;
  *
  * @author Minh Anh
  */
-@Mapper
+@Mapper(componentModel = "spring")
 public interface DocumentMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "fileType", ignore = true)
-    @Mapping(target = "categoryId", ignore = true)
-    @Mapping(target = "userId", ignore = true)
+    @Mapping(target = "category", ignore = true)
+    @Mapping(target = "user", ignore = true)
     @Mapping(target = "tags", ignore = true)
     @Mapping(target = "comments", ignore = true)
+    @Mapping(target = "totalView", ignore = true)
+    @Mapping(target = "totalLike", ignore = true)
     Document toPojo(DocumentRequestDto requestDto);
 
-    @Mapping(source = "userId.id", target = "uploaderId")
-    @Mapping(source = "userId.username", target = "uploaderName")
-    @Mapping(target = "tagNames", ignore = true)   
-    @Mapping(target = "viewCount", ignore = true)  
-    @Mapping(target = "likeCount", ignore = true)
+    @Mapping(source = "user.id", target = "uploaderId")
+    @Mapping(source = "user.username", target = "uploaderName")
+    @Mapping(target = "tagNames", ignore = true)
     DocumentResponseDto toDto(Document d);
+
+    @Mapping(target = "uploaderId", source = "d.user.id")
+    @Mapping(target = "uploaderName", source = "d.user.username")
+    @Mapping(target = "categoryId", source = "d.category.id")
+    @Mapping(target = "categoryName", source = "d.category.name")
+    @Mapping(target = "tagNames", expression = "java(d.getTags().stream().map(tag -> tag.getName()).toList())")
+    DocumentDetailResponseDto toDetailDto(Document d);
 }
