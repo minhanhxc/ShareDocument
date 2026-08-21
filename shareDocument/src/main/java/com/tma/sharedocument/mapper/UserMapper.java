@@ -7,12 +7,14 @@ package com.tma.sharedocument.mapper;
 import com.tma.sharedocument.dto.UserRequestDto;
 import com.tma.sharedocument.dto.UserResponseDto;
 import com.tma.sharedocument.pojo.User;
+import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 /**
  *
  * @author Minh Anh
  */
+@Mapper
 public interface UserMapper {
 
     @Mapping(target = "id", ignore = true)

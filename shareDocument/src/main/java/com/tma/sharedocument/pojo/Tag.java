@@ -9,15 +9,13 @@ package com.tma.sharedocument.pojo;
  * @author Minh Anh
  */
 import jakarta.persistence.*;
-import lombok.*;
 
 @Entity
 @Table(name = "tag")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
 public class Tag {
+
+    public Tag() {
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,5 +23,33 @@ public class Tag {
 
     @Column(nullable = false, unique = true, length = 50)
     private String name;
+
+    /**
+     * @return the id
+     */
+    public Long getId() {
+        return id;
+    }
+
+    /**
+     * @param id the id to set
+     */
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    /**
+     * @return the name
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * @param name the name to set
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
 
 }

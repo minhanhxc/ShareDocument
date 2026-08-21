@@ -4,11 +4,13 @@
  */
 package com.tma.sharedocument.controller;
 
+import com.tma.sharedocument.dto.DocumentDetailResponseDto;
 import com.tma.sharedocument.dto.DocumentRequestDto;
 import com.tma.sharedocument.dto.DocumentResponseDto;
 import com.tma.sharedocument.pojo.User;
 import com.tma.sharedocument.service.DocumentService;
 import jakarta.validation.Valid;
+import java.security.Principal;
 import java.util.List;
 import java.util.Map;
 import org.springframework.data.domain.Page;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -35,11 +38,11 @@ public class DocumentController {
     private DocumentService documentService;
 
     @PostMapping
-    public ResponseEntity<DocumentResponseDto> createDocument(
+    @ResponseStatus(HttpStatus.CREATED)
+    public void createDocument(
             @Valid @RequestBody DocumentRequestDto dto,
             @AuthenticationPrincipal UserDetails user) {
-        DocumentResponseDto response = documentService.createDocument(dto, user.getUsername());
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        documentService.createDocument(dto, user.getUsername());
     }
 
     @GetMapping
@@ -53,9 +56,11 @@ public class DocumentController {
         return new ResponseEntity(response, HttpStatus.OK);
     }
 
-//    @GetMapping("/{documentId}")
-//    public ResponseEntity<DocumentResponseDto> detailDocument(
-//            @Valid @PathVariable Long documentId) {
-//        Document
-//    }
+    @GetMapping("/{documentId}")
+    public ResponseEntity<DocumentResponseDto> detailDocument(
+            @PathVariable Long documentId,
+            Principal principal) {
+        DocumentDetailResponseDto response = documentService.detailDocument(documentId, principal.getName());
+        return new ResponseEntity(response, HttpStatus.OK);
+    }
 }
