@@ -4,13 +4,17 @@
  */
 package com.tma.sharedocument.service;
 
+import com.tma.sharedocument.dto.CollectionDetailResponseDto;
 import com.tma.sharedocument.dto.CollectionRequestDto;
+import com.tma.sharedocument.dto.CollectionResponseDto;
+import com.tma.sharedocument.mapper.CollectionMapper;
 import com.tma.sharedocument.pojo.Collection;
 import com.tma.sharedocument.pojo.Document;
 import com.tma.sharedocument.pojo.User;
 import com.tma.sharedocument.repository.CollectionRepository;
 import com.tma.sharedocument.repository.DocumentRepository;
 import com.tma.sharedocument.repository.UserRepository;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,16 +32,30 @@ public class CollectionService {
     private DocumentRepository documentRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private CollectionMapper collectionMapper;
     
     @Transactional
-    public Collection createCollection(CollectionRequestDto request, String username) {
+    public List<CollectionResponseDto> listCollection(String username) {
+        return collectionRepository.findAllByUserUsername(username);
+    } 
+    
+    @Transactional
+    public CollectionDetailResponseDto detailCollection(Long collectionId, String username){
+       Collection collection = collectionRepository.findByIdAndUserUsername(collectionId, username)
+                .orElseThrow(() -> new RuntimeException("Mục yêu thích không tồn tại hoặc bạn không có quyền xem"));
+
+        return collectionMapper.toDetailDto(collection);
+    }
+    
+    @Transactional
+    public CollectionResponseDto createCollection(CollectionRequestDto dto, String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Người dùng không tồn tại"));
-        Collection collection = new Collection();
-        collection.setName(request.getName());
+        Collection collection = collectionMapper.toPojo(dto);
         collection.setUser(user);
-        
-        return collectionRepository.save(collection);
+        collectionRepository.save(collection);
+        return collectionMapper.toDto(collection);
     }
     @Transactional
     public void deleteCollection(Long collectionId, String username) {

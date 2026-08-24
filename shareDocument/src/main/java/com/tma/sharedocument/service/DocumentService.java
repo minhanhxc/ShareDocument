@@ -56,7 +56,7 @@ public class DocumentService {
     @Autowired
     private CollectionRepository collectionRepository;
 
-    public void createDocument(DocumentRequestDto dto, String username) {
+    public DocumentResponseDto createDocument(DocumentRequestDto dto, String username) {
         Document document = documentMapper.toPojo(dto);
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User không tồn tại"));
@@ -88,6 +88,8 @@ public class DocumentService {
         }
         document.setTags(documentTags);
         documentRepository.save(document);
+        return documentMapper.toDto(document);
+        
     }
 
     public Page<DocumentResponseDto> listDocument(String keyword, Long categoryId,

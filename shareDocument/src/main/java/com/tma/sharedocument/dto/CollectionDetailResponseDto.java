@@ -4,24 +4,30 @@
  */
 package com.tma.sharedocument.dto;
 
+import java.util.List;
 
-
-
-
-public class CollectionResponseDto {
+/**
+ *
+ * @author ADMIN
+ */
+public class CollectionDetailResponseDto {
+    
     private Long id;
     private String name;
     private Integer totalDocument;
+    private List<DocumentResponseDto> documents;
 
-    public CollectionResponseDto() {
-    }
-
-    public CollectionResponseDto(Long id, String name, Integer totalDocument) {
+    public CollectionDetailResponseDto(Long id, String name, Integer totalDocument, List<DocumentResponseDto> documents) {
         this.id = id;
         this.name = name;
         this.totalDocument = totalDocument;
+        this.documents = documents;
     }
 
+    public CollectionDetailResponseDto() {
+    }
+    
+    
     
 
     /**
@@ -52,6 +58,19 @@ public class CollectionResponseDto {
         this.name = name;
     }
 
+    /**
+     * @return the documents
+     */
+    public List<DocumentResponseDto> getDocuments() {
+        return documents;
+    }
+
+    /**
+     * @param documents the documents to set
+     */
+    public void setDocuments(List<DocumentResponseDto> documents) {
+        this.documents = documents;
+    }
 
     /**
      * @return the totalDocument

@@ -38,11 +38,11 @@ public class DocumentController {
     private DocumentService documentService;
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public void createDocument(
+    public ResponseEntity<DocumentResponseDto> createDocument(
             @Valid @RequestBody DocumentRequestDto dto,
             @AuthenticationPrincipal UserDetails user) {
-        documentService.createDocument(dto, user.getUsername());
+        DocumentResponseDto response = documentService.createDocument(dto, user.getUsername());
+        return new ResponseEntity(response, HttpStatus.OK);
     }
 
     @GetMapping
@@ -59,8 +59,8 @@ public class DocumentController {
     @GetMapping("/{documentId}")
     public ResponseEntity<DocumentResponseDto> detailDocument(
             @PathVariable Long documentId,
-            Principal principal) {
-        DocumentDetailResponseDto response = documentService.detailDocument(documentId, principal.getName());
+            @AuthenticationPrincipal UserDetails user) {
+        DocumentDetailResponseDto response = documentService.detailDocument(documentId, user.getUsername());
         return new ResponseEntity(response, HttpStatus.OK);
     }
 }
