@@ -4,6 +4,8 @@
  */
 package com.tma.sharedocument.service;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import com.tma.sharedocument.dto.DocumentDetailResponseDto;
 import com.tma.sharedocument.dto.DocumentRequestDto;
 import com.tma.sharedocument.dto.DocumentResponseDto;
@@ -20,9 +22,12 @@ import com.tma.sharedocument.repository.LikeRepository;
 import com.tma.sharedocument.repository.TagRepository;
 import com.tma.sharedocument.repository.UserRepository;
 import com.tma.sharedocument.repository.ViewRepository;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -31,41 +36,51 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  *
  * @author Minh Anh
  */
 @Service
+@RequiredArgsConstructor
 public class DocumentService {
 
-    @Autowired
-    private DocumentMapper documentMapper;
-    @Autowired
-    private DocumentRepository documentRepository;
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private CategoryRepository categoryRepository;
-    @Autowired
-    private TagRepository tagRepository;
-    @Autowired
-    private ViewRepository viewRepository;
-    @Autowired
-    private LikeRepository likeRepository;
-    @Autowired
-    private CollectionRepository collectionRepository;
-
-    public DocumentResponseDto createDocument(DocumentRequestDto dto, String username) {
+    
+    private final DocumentMapper documentMapper;
+    private final DocumentRepository documentRepository;
+    private final UserRepository userRepository;
+    private final CategoryRepository categoryRepository;
+    private final TagRepository tagRepository;
+    private final ViewRepository viewRepository;
+    private final LikeRepository likeRepository;
+    private final CollectionRepository collectionRepository;
+    private final Cloudinary cloudinary;
+    
+    public String uploadFile(MultipartFile file) throws IOException{
+        if (file == null || file.isEmpty()) {
+            return null;
+        }
+        Map uploadResult = cloudinary.uploader().upload(file.getBytes(), 
+            ObjectUtils.asMap("resource_type", "auto"));
+        return uploadResult.get("secure_url").toString();
+    }
+    
+    
+    
+    public DocumentResponseDto createDocument(DocumentRequestDto dto, String username) throws IOException {
         Document document = documentMapper.toPojo(dto);
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User không tồn tại"));
         Category category = categoryRepository.findById(dto.getCategoryId())
                 .orElseThrow(() -> new RuntimeException("Danh mục không tồn tại"));
-        
+        String fileUrl = this.uploadFile(dto.getFileUrl());
+        String thumbnail = this.uploadFile(dto.getThumbnail());
+        document.setFileUrl(fileUrl);
+        document.setThumbnail(thumbnail);
         document.setUser(user);
         document.setCategory(category);
-        document.setFileType(StringUtils.getFilenameExtension(document.getFileUrl()));
+        document.setFileType(StringUtils.getFilenameExtension(dto.getFileUrl().getOriginalFilename()));
 
         Set<Tag> documentTags = new HashSet<>();
         if (dto.getExistingTagIds() != null && !dto.getExistingTagIds().isEmpty()) {
@@ -127,5 +142,10 @@ public class DocumentService {
             throw new RuntimeException("Bạn không có quyền xóa tài liệu");
         collectionRepository.removeDocumentFromAllCollections(doccumentId);
         documentRepository.delete(document);
+    }
+    
+    public List<Category> listCate(){
+        List<Category> categories = categoryRepository.findAll();
+        return categories;
     }
 }

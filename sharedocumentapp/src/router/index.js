@@ -3,6 +3,7 @@ import login from '../views/user/login.vue'
 import register from '../views/user/register.vue'
 import home from '../views/home.vue'
 import documentDetail from '../views/document/detail.vue'
+import upload from '../views/document/upload.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -30,6 +31,11 @@ const router = createRouter({
       path: '/documents/:id',
       name: 'documentDetail',
       component: documentDetail,
+    },
+    {
+      path: '/documents/upload',
+      name: 'upload',
+      component: upload,
     },
   ],
 })

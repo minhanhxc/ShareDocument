@@ -14,7 +14,7 @@ const confirmPassword = ref('')
 const avatarFile = ref(null)
 const avatarPreview = ref('')
 const isLoading = ref(false)
-
+const errorMessage = ref('')
 const handleAvatarChange = (event) => {
   const file = event.target.files[0]
   if (file) {
@@ -35,6 +35,7 @@ const handleRegister = async () => {
   }
 
   isLoading.value = true
+  errorMessage.value = ''
   try {
     const formData = new FormData()
     formData.append('ho', ho.value)
@@ -52,8 +53,8 @@ const handleRegister = async () => {
     alert('Đăng ký tài khoản thành công! Vui lòng đăng nhập.')
     router.push('/login')
   } catch (error) {
-    console.error('Register failed:', error)
-    alert('Đăng ký thất bại. Vui lòng kiểm tra lại thông tin!')
+    errorMessage.value = error.response?.data?.message || 'Không thể kết nối tới server'
+    console.error('Đăng ký thất bại:', errorMessage.value)
   } finally {
     isLoading.value = false
   }
@@ -208,11 +209,12 @@ const handleRegister = async () => {
           <button type="submit" class="btn-primary" :disabled="isLoading">
             <span>{{ isLoading ? 'Creating Account...' : 'Create Account' }}</span>
           </button>
+          <p v-if="errorMessage" style="color: red">{{ errorMessage }}</p>
         </form>
 
         <!-- Footer -->
         <p class="footer-text">
-          Already have an account?
+          Đã có tài khoản?
           <RouterLink to="/login" class="login-link">Log in</RouterLink>
         </p>
       </div>

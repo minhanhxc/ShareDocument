@@ -27,6 +27,8 @@ public interface DocumentMapper {
     @Mapping(target = "comments", ignore = true)
     @Mapping(target = "totalView", ignore = true)
     @Mapping(target = "totalLike", ignore = true)
+    @Mapping(target = "fileUrl", ignore = true)
+    @Mapping(target = "thumbnail", ignore = true)
     Document toPojo(DocumentRequestDto requestDto);
 
     @Mapping(source = "user.id", target = "uploaderId")

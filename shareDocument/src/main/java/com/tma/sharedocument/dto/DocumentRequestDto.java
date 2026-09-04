@@ -11,6 +11,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 @Data
 @NoArgsConstructor
@@ -20,12 +21,12 @@ public class DocumentRequestDto {
     @NotBlank(message = "Tiêu đề không được để trống")
     private String title;
     private String description;
-    @NotBlank(message = "File URL không được để trống")
-    private String fileUrl;
+    @NotBlank(message = "Chưa tải file lên")
+    private MultipartFile fileUrl;
     @NotNull(message = "Phải chọn danh mục")
     private Long categoryId;
     @NotBlank(message = "Ảnh bìa không được để trống")
-    private String thumbnail;
+    private MultipartFile thumbnail;
     private List<Long> existingTagIds;
     private List<String> newTagNames;
 

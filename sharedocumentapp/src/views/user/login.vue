@@ -10,13 +10,14 @@ const router = useRouter()
 const username = ref('')
 const password = ref('')
 const isLoading = ref(false)
-
+const errorMessage = ref('')
 const handleLogin = async () => {
   if (!username.value || !password.value) {
     alert('Vui lòng nhập đầy dủ thông tin')
     return
   }
   isLoading.value = true
+  errorMessage.value = ''
   try {
     const res = await Apis.post(endpoints['login'], {
       username: username.value,
@@ -32,7 +33,8 @@ const handleLogin = async () => {
     authStore.setUser(userData)
     router.push('/')
   } catch (error) {
-    console.error('Login failed:', error)
+    errorMessage.value = error.response?.data?.message || 'Không thể kết nối tới server'
+    console.error('Login failed:', errorMessage.value)
   } finally {
     isLoading.value = false
   }
@@ -92,6 +94,7 @@ const handleLogin = async () => {
             <polyline points="12 5 19 12 12 19"></polyline>
           </svg>
         </button>
+        <p v-if="errorMessage" style="color: red">{{ errorMessage }}</p>
       </form>
 
       <p class="footer-text">

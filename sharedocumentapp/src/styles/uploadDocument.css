@@ -1,0 +1,431 @@
+.upload-page {
+  --bg-main: #f4f7f6;
+  --bg-panel: #ffffff;
+  --bg-input: #ffffff;
+  --bg-hover: #f8fafc;
+  --border-color: #e2e8f0;
+  --border-focus: #0d6efd;
+
+  --text-main: #1e293b;
+  --text-muted: #64748b;
+  --text-red: #ef4444;
+
+  --primary-blue: #0d6efd;
+  --primary-hover: #0b5ed7;
+  --primary-light: #eef2ff; /* Xanh nhạt cho box icon và thẻ tag */
+  --primary-text: #1d4ed8;
+
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  min-height: 100vh;
+  padding: 40px 20px;
+  font-family: 'Inter', sans-serif;
+}
+
+.upload-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* 2. TIÊU ĐỀ TRANG */
+.page-header {
+  margin-bottom: 32px;
+}
+.page-title {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0 0 8px 0;
+  color: #0f172a;
+}
+.page-subtitle {
+  font-size: 15px;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* 3. BỐ CỤC 2 CỘT */
+.upload-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+@media (max-width: 992px) {
+  .upload-content {
+    grid-template-columns: 1fr;
+  }
+}
+
+.panel {
+  background-color: var(--bg-panel);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+/* Các lớp tiện ích (Utility) */
+.flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.text-blue {
+  color: var(--primary-blue);
+}
+.mt-3 {
+  margin-top: 12px;
+}
+.mb-4 {
+  margin-bottom: 24px;
+}
+.mb-0 {
+  margin-bottom: 0;
+}
+.icon-sm {
+  font-size: 18px;
+  margin-right: 6px;
+}
+
+/* 4. CỘT TRÁI - DRAG & DROP */
+.panel-header {
+  margin-bottom: 20px;
+}
+.panel-title {
+  font-size: 16px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  color: var(--text-main);
+}
+.required-text {
+  color: var(--text-red);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.drag-drop-zone {
+  border: 2px dashed #cbd5e1;
+  border-radius: 12px;
+  padding: 40px 24px;
+  text-align: center;
+  background-color: #fcfcfd;
+  transition: all 0.2s;
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.drag-drop-zone:hover {
+  border-color: var(--primary-blue);
+  background-color: var(--primary-light);
+}
+
+.icon-box {
+  background-color: var(--primary-light);
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+.icon-large {
+  font-size: 32px;
+  margin: 0;
+}
+
+.drop-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+  color: var(--text-main);
+}
+.drop-subtitle {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin: 0 0 16px 0;
+}
+
+/* 5. CỘT TRÁI - FILE PREVIEW */
+.section-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+  text-transform: uppercase;
+}
+.file-card {
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 16px;
+  background-color: var(--bg-panel);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+}
+.file-info-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+.file-icon {
+  font-weight: 700;
+  font-size: 12px;
+  border-radius: 6px;
+  padding: 8px 10px;
+}
+.pdf-icon {
+  background-color: #fee2e2;
+  color: var(--text-red);
+}
+.file-details {
+  flex-grow: 1;
+  overflow: hidden;
+}
+.file-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 4px;
+}
+.file-meta {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.btn-icon {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.btn-icon:hover {
+  color: var(--text-red);
+}
+
+.progress-container {
+  height: 4px;
+  background-color: var(--border-color);
+  border-radius: 2px;
+  margin-bottom: 6px;
+  overflow: hidden;
+}
+.progress-bar {
+  height: 100%;
+  background-color: var(--primary-blue);
+}
+.progress-text {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* 6. CỘT PHẢI - FORM CHUNG */
+.form-group {
+  margin-bottom: 24px;
+}
+.form-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+.required-asterisk {
+  color: var(--text-red);
+}
+.helper-text {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.form-control {
+  width: 100%;
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  box-sizing: border-box;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+.form-control:focus {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.1);
+}
+.form-control::placeholder {
+  color: #94a3b8;
+}
+
+/* Custom Select */
+.select-wrapper {
+  position: relative;
+}
+.select-wrapper select {
+  appearance: none;
+  padding-right: 40px;
+  cursor: pointer;
+}
+.select-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+/* 7. CỘT PHẢI - TAGS */
+.tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+  border: 1px solid var(--border-color);
+  padding: 12px;
+  border-radius: 8px;
+  background-color: #f8fafc;
+  min-height: 52px;
+}
+.tag-item {
+  background-color: var(--primary-light);
+  color: var(--primary-text);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 6px 10px 6px 14px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.icon-close {
+  font-size: 14px;
+  cursor: pointer;
+  color: #60a5fa;
+}
+.icon-close:hover {
+  color: var(--primary-text);
+}
+
+.tag-input-group {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.btn-add-tag {
+  white-space: nowrap;
+}
+
+.tag-suggestions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.suggestion-label {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.suggestion-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.btn-suggestion {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-suggestion:hover {
+  background: var(--bg-hover);
+  color: var(--text-main);
+  border-color: #cbd5e1;
+}
+
+/* 8. CỘT PHẢI - TEXTAREA & BUTTONS */
+.textarea-desc {
+  height: 120px;
+  resize: none;
+  line-height: 1.5;
+}
+
+.panel-divider {
+  border: none;
+  border-top: 1px solid var(--border-color);
+  margin: 32px 0 24px 0;
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+}
+
+/* Các Nút Bấm chung */
+.btn-primary {
+  background-color: var(--primary-blue);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+.btn-primary:hover {
+  background-color: var(--primary-hover);
+}
+
+.btn-outline {
+  background-color: var(--bg-panel);
+  color: var(--primary-blue);
+  border: 1px solid var(--border-color);
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+.btn-outline:hover {
+  background-color: var(--bg-hover);
+  border-color: #cbd5e1;
+}
+
+.btn-cancel {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-cancel:hover {
+  background: var(--bg-hover);
+}
+
+.btn-sm {
+  padding: 10px 20px;
+}

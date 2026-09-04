@@ -8,6 +8,10 @@ export const endpoints = {
   profile: '/profile',
   documents: '/documents',
   documentDetail: (id) => `/documents/${id}`,
+  like: (id) => `/documents/${id}/like`,
+  bookmarked: (id) => `/documents/${id}/bookmark`,
+  upload: (formData) => `/documents/upload`,
+  categories: '/categories',
 }
 
 const Apis = axios.create({
@@ -16,14 +20,13 @@ const Apis = axios.create({
     'Content-Type': 'application/json',
   },
 })
-
-export const authApis = () => {
-  return axios.create({
-    baseURL: baseURL,
-    headers: {
-      Authorization: `Bearer ${cookie.get('token')}`,
-    },
-  })
-}
+export const authApis = axios.create({ baseURL })
+authApis.interceptors.request.use((config) => {
+  const token = cookie.get('token')
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`
+  }
+  return config
+})
 
 export default Apis
