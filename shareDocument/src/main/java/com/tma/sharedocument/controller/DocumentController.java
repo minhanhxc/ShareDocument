@@ -7,12 +7,10 @@ package com.tma.sharedocument.controller;
 import com.tma.sharedocument.dto.DocumentDetailResponseDto;
 import com.tma.sharedocument.dto.DocumentRequestDto;
 import com.tma.sharedocument.dto.DocumentResponseDto;
-import com.tma.sharedocument.pojo.User;
 import com.tma.sharedocument.service.DocumentService;
 import jakarta.validation.Valid;
-import java.security.Principal;
 import java.util.List;
-import java.util.Map;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +22,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -32,12 +29,13 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Minh Anh
  */
 @RestController
-@RequestMapping("/api/documents")
+@RequestMapping("/api")
+@RequiredArgsConstructor
 public class DocumentController {
 
-    private DocumentService documentService;
+    private final DocumentService documentService;
 
-    @PostMapping
+    @PostMapping("/documents/upload")
     public ResponseEntity<DocumentResponseDto> createDocument(
             @Valid @RequestBody DocumentRequestDto dto,
             @AuthenticationPrincipal UserDetails user) {
@@ -45,18 +43,19 @@ public class DocumentController {
         return new ResponseEntity(response, HttpStatus.OK);
     }
 
-    @GetMapping
+    @GetMapping("/documents")
     public ResponseEntity<List<DocumentResponseDto>> listDocument(
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) Long categoryId,
             @RequestParam(required = false) Long tagId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        Page<DocumentResponseDto> response = documentService.listDocument(keyword, categoryId, tagId, page, size);
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy) {
+        Page<DocumentResponseDto> response = documentService.listDocument(keyword, categoryId, tagId, page, size, sortBy);
         return new ResponseEntity(response, HttpStatus.OK);
     }
 
-    @GetMapping("/{documentId}")
+    @GetMapping("/documents/{documentId}")
     public ResponseEntity<DocumentResponseDto> detailDocument(
             @PathVariable Long documentId,
             @AuthenticationPrincipal UserDetails user) {

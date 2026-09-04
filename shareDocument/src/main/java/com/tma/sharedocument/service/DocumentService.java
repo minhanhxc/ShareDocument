@@ -93,10 +93,10 @@ public class DocumentService {
     }
 
     public Page<DocumentResponseDto> listDocument(String keyword, Long categoryId,
-            Long tagId, int page, int size) {
+            Long tagId, int page, int size, String sortBy) {
 
-
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        String sortField = "views".equalsIgnoreCase(sortBy) ? "totalView" : "createdAt";
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortField).descending());
 
         Page<Document> documentPage = documentRepository.findAll(keyword, categoryId, tagId, pageable);
 

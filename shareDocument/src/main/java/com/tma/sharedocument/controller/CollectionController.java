@@ -8,7 +8,6 @@ import com.tma.sharedocument.dto.CollectionDetailResponseDto;
 import com.tma.sharedocument.dto.CollectionRequestDto;
 import com.tma.sharedocument.dto.CollectionResponseDto;
 import com.tma.sharedocument.service.CollectionService;
-import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -10,13 +10,15 @@ package com.tma.sharedocument.pojo;
  */
 import jakarta.persistence.*;
 import java.util.Set;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "collection")
+@Data
+@NoArgsConstructor
 public class Collection {
 
-    public Collection() {
-    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,59 +39,4 @@ public class Collection {
     )
     private Set<Document> documents;
 
-    /**
-     * @return the id
-     */
-    public Long getId() {
-        return id;
-    }
-
-    /**
-     * @param id the id to set
-     */
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    /**
-     * @return the name
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * @param name the name to set
-     */
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    /**
-     * @return the user
-     */
-    public User getUser() {
-        return user;
-    }
-
-    /**
-     * @param user the user to set
-     */
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    /**
-     * @return the documents
-     */
-    public Set<Document> getDocuments() {
-        return documents;
-    }
-
-    /**
-     * @param documents the documents to set
-     */
-    public void setDocuments(Set<Document> documents) {
-        this.documents = documents;
-    }
 }

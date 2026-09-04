@@ -8,7 +8,13 @@ import java.util.List;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class DocumentRequestDto {
 
     @NotBlank(message = "Tiêu đề không được để trống")
@@ -18,103 +24,9 @@ public class DocumentRequestDto {
     private String fileUrl;
     @NotNull(message = "Phải chọn danh mục")
     private Long categoryId;
+    @NotBlank(message = "Ảnh bìa không được để trống")
+    private String thumbnail;
     private List<Long> existingTagIds;
     private List<String> newTagNames;
-
-    public DocumentRequestDto(String title, String description, String fileUrl, Long categoryId, List<Long> existingTagIds, List<String> newTagNames) {
-        this.title = title;
-        this.description = description;
-        this.fileUrl = fileUrl;
-        this.categoryId = categoryId;
-        this.existingTagIds = existingTagIds;
-        this.newTagNames = newTagNames;
-    }
-
-    public DocumentRequestDto() {
-    }
-
-    /**
-     * @return the title
-     */
-    public String getTitle() {
-        return title;
-    }
-
-    /**
-     * @param title the title to set
-     */
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    /**
-     * @return the description
-     */
-    public String getDescription() {
-        return description;
-    }
-
-    /**
-     * @param description the description to set
-     */
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    /**
-     * @return the fileUrl
-     */
-    public String getFileUrl() {
-        return fileUrl;
-    }
-
-    /**
-     * @param fileUrl the fileUrl to set
-     */
-    public void setFileUrl(String fileUrl) {
-        this.fileUrl = fileUrl;
-    }
-
-    /**
-     * @return the categoryId
-     */
-    public Long getCategoryId() {
-        return categoryId;
-    }
-
-    /**
-     * @param categoryId the categoryId to set
-     */
-    public void setCategoryId(Long categoryId) {
-        this.categoryId = categoryId;
-    }
-
-    /**
-     * @return the existingTagIds
-     */
-    public List<Long> getExistingTagIds() {
-        return existingTagIds;
-    }
-
-    /**
-     * @param existingTagIds the existingTagIds to set
-     */
-    public void setExistingTagIds(List<Long> existingTagIds) {
-        this.existingTagIds = existingTagIds;
-    }
-
-    /**
-     * @return the newTagNames
-     */
-    public List<String> getNewTagNames() {
-        return newTagNames;
-    }
-
-    /**
-     * @param newTagNames the newTagNames to set
-     */
-    public void setNewTagNames(List<String> newTagNames) {
-        this.newTagNames = newTagNames;
-    }
 
 }

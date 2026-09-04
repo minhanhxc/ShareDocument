@@ -31,12 +31,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api") 
 public class CommentController {
 
-    private final CommentService commentService;
+    private CommentService commentService;
 
-    // Constructor Injection
-    public CommentController(CommentService commentService) {
-        this.commentService = commentService;
-    }
+
 
     @GetMapping("/documents/{documentId}/comments")
     public ResponseEntity<List<CommentResponseDto>> getCommentsByDocument(
