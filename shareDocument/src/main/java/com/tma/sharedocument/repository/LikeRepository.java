@@ -6,6 +6,7 @@ package com.tma.sharedocument.repository;
 
 import com.tma.sharedocument.pojo.Like;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -19,5 +20,5 @@ public interface LikeRepository extends JpaRepository<Like, Long> {
     
     Boolean existsByUserIdAndDocumentId(Long userId, Long documentId);
     
-    List<Like> findByUserIdAndDocumentId(Long userId, Long documentId);
+    Optional<Like> findByUserIdAndDocumentId(Long userId, Long documentId);
 }

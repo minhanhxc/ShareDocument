@@ -429,3 +429,57 @@
 .btn-sm {
   padding: 10px 20px;
 }
+/* --- CSS CHO KHUNG ẢNH BÌA --- */
+.mt-4 {
+  margin-top: 24px;
+}
+.text-muted {
+  color: var(--text-muted);
+}
+
+.thumbnail-upload-zone {
+  border: 1px dashed #cbd5e1;
+  border-radius: 8px;
+  padding: 32px 16px;
+  text-align: center;
+  cursor: pointer;
+  background-color: #f8fafc;
+  transition: all 0.2s;
+}
+.thumbnail-upload-zone:hover {
+  border-color: var(--primary-blue);
+  background-color: var(--primary-light);
+}
+
+.thumbnail-preview-zone {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+}
+.thumbnail-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.btn-remove-thumb {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s;
+}
+.btn-remove-thumb:hover {
+  background-color: #fee2e2;
+  color: var(--text-red);
+}

@@ -21,11 +21,10 @@ public class DocumentRequestDto {
     @NotBlank(message = "Tiêu đề không được để trống")
     private String title;
     private String description;
-    @NotBlank(message = "Chưa tải file lên")
+    @NotNull(message = "File tài liệu không được để trống")
     private MultipartFile fileUrl;
     @NotNull(message = "Phải chọn danh mục")
     private Long categoryId;
-    @NotBlank(message = "Ảnh bìa không được để trống")
     private MultipartFile thumbnail;
     private List<Long> existingTagIds;
     private List<String> newTagNames;

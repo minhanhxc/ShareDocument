@@ -33,7 +33,8 @@ public interface DocumentMapper {
 
     @Mapping(source = "user.id", target = "uploaderId")
     @Mapping(source = "user.username", target = "uploaderName")
-    @Mapping(target = "tagNames", ignore = true)
+    @Mapping(target = "tagNames", expression = "java(d.getTags().stream().map(tag -> tag.getName()).toList())")
+    @Mapping(source = "category.name", target = "categoryName")
     DocumentResponseDto toDto(Document d);
 
     @Mapping(target = "uploaderId", source = "d.user.id")
@@ -41,5 +42,7 @@ public interface DocumentMapper {
     @Mapping(target = "categoryId", source = "d.category.id")
     @Mapping(target = "categoryName", source = "d.category.name")
     @Mapping(target = "tagNames", expression = "java(d.getTags().stream().map(tag -> tag.getName()).toList())")
+    @Mapping(target = "liked", ignore = true)
+    @Mapping(target = "bookmarked", ignore = true)
     DocumentDetailResponseDto toDetailDto(Document d);
 }

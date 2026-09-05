@@ -19,6 +19,8 @@ const fetchDocumentDetail = async () => {
     const docId = route.params.id
     const res = await authApis.get(endpoints['documentDetail'](docId))
     documentData.value = res.data
+    isLiked.value = res.data.isLiked || false
+    isBookmarked.value = res.data.isBookmarked || false
   } catch (error) {
     errorMessage.value = error.response?.data?.message || 'Không thể kết nối tới server'
     console.error('Lỗi khi tải dữ liệu:', errorMessage.value)
@@ -30,13 +32,22 @@ const fetchDocumentDetail = async () => {
 const handleLike = async () => {
   if (!documentData.value) return
   errorMessage.value = ''
+  const previousState = isLiked.value
   isLiked.value = !isLiked.value
+  documentData.value.likeCount = isLiked.value
+    ? (documentData.value.likeCount || 0) + 1
+    : Math.max(0, (documentData.value.likeCount || 0) - 1)
+
   try {
     const docId = route.params.id
-    const res = await authApis.post(`/documents/${docId}/like`)
+    const res = await authApis.post(endpoints['like'](docId))
+    isLiked.value = res.data
     console.log(`Đã ${isLiked.value ? 'thích' : 'bỏ thích'} tài liệu ${docId}`)
   } catch (error) {
-    isLiked.value = !isLiked.value
+    isLiked.value = previousState
+    documentData.value.likeCount = isLiked.value
+      ? (documentData.value.likeCount || 0) + 1
+      : Math.max(0, (documentData.value.likeCount || 0) - 1)
     errorMessage.value = error.response?.data?.message || 'Không thể kết nối tới server'
 
     console.error('Lỗi khi thích tài liệu:', errorMessage.value)
@@ -45,15 +56,16 @@ const handleLike = async () => {
 
 const handleBookmark = async () => {
   if (!documentData.value) return
-
+  const previousState = isBookmarked.value
   isBookmarked.value = !isBookmarked.value
 
   try {
     const docId = route.params.id
-    const res = await authApis.post(`/documents/${docId}/bookmark`)
+    const res = await authApis.post(endpoints['bookmarked'](docId))
+    isBookmarked.value = res.data
     console.log(`Đã ${isBookmarked.value ? 'lưu' : 'bỏ lưu'} tài liệu ${docId}`)
   } catch (error) {
-    isBookmarked.value = !isBookmarked.value
+    isBookmarked.value = previousState
     errorMessage.value = error.response?.data?.message || 'Không thể kết nối tới server'
     console.error('Lỗi khi lưu tài liệu:', errorMessage.value)
   }
@@ -223,7 +235,11 @@ const postComment = () => {
             </button>
 
             <!-- Nút Lưu -->
-            <button class="btn-outline" :class="{ 'active-btn': isBookmarked }" @click="handleSave">
+            <button
+              class="btn-outline"
+              :class="{ 'active-btn': isBookmarked }"
+              @click="handleBookmark"
+            >
               <span
                 class="material-symbols-outlined icon-md"
                 :data-weight="isBookmarked ? 'fill' : ''"

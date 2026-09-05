@@ -13,9 +13,12 @@ const description = ref('')
 const tags = ref([])
 const tagInput = ref('')
 const categories = ref([])
-
+const tagsList = ref([])
+const thumbnailInputRef = ref(null)
+const thumbnailFile = ref(null)
+const thumbnailPreview = ref('')
 const selectedFile = ref(null)
-const uploadProgress = ref(0)
+
 const isUploading = ref(false)
 const errorMessage = ref('')
 
@@ -29,9 +32,19 @@ const fetchCategories = async () => {
     console.error('Lỗi khi tải danh mục:', errorMessage.value)
   }
 }
+const fetchTags = async () => {
+  try {
+    const res = await authApis.get(endpoints['tags'])
+    tagsList.value = res.data
+  } catch (error) {
+    errorMessage.value = error.response?.data?.message || 'Không thể kết nối tới server'
+    console.error('Lỗi khi tải danh sách tag:', errorMessage.value)
+  }
+}
 
 onMounted(() => {
   fetchCategories()
+  fetchTags()
 })
 
 // --- 3. XỬ LÝ KÉO THẢ & CHỌN FILE ---
@@ -57,7 +70,6 @@ const handleDrop = (event) => {
 
 const removeFile = () => {
   selectedFile.value = null
-  uploadProgress.value = 0
   if (fileInputRef.value) fileInputRef.value.value = ''
 }
 
@@ -69,12 +81,37 @@ const formatFileSize = (bytes) => {
   const i = Math.floor(Math.log(bytes) / Math.log(k))
   return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i]
 }
+// --- XỬ LÝ ẢNH BÌA (THUMBNAIL) ---
+
+const triggerThumbnailInput = () => {
+  thumbnailInputRef.value.click()
+}
+
+const handleThumbnailSelect = (event) => {
+  const file = event.target.files[0]
+  if (file && file.type.startsWith('image/')) {
+    thumbnailFile.value = file
+    thumbnailPreview.value = URL.createObjectURL(file) // Tạo URL tạm để hiển thị trước
+  }
+}
+
+const removeThumbnail = () => {
+  thumbnailFile.value = null
+  thumbnailPreview.value = ''
+  if (thumbnailInputRef.value) thumbnailInputRef.value.value = ''
+}
 
 // --- 4. XỬ LÝ THẺ (TAGS) ---
 const addTag = () => {
-  const newTag = tagInput.value.trim()
-  if (newTag && !tags.value.includes(newTag) && tags.value.length < 8) {
-    tags.value.push(newTag)
+  const newTagName = tagInput.value.trim()
+  if (!newTagName) return
+
+  // Kiểm tra xem tên thẻ đã tồn tại trong danh sách đang chọn chưa
+  const isExist = tags.value.some((t) => t.name?.toLowerCase() === newTagName.toLowerCase())
+
+  if (!isExist && tags.value.length < 8) {
+    // Thẻ tự nhập không có ID (id: null)
+    tags.value.push({ id: null, name: newTagName })
   }
   tagInput.value = '' // Reset ô nhập
 }
@@ -83,9 +120,12 @@ const removeTag = (index) => {
   tags.value.splice(index, 1)
 }
 
-const addSuggestedTag = (tag) => {
-  if (!tags.value.includes(tag) && tags.value.length < 8) {
-    tags.value.push(tag)
+const addSuggestedTag = (selectedTag) => {
+  const isExist = tags.value.some((t) => t.id === selectedTag.id)
+
+  if (!isExist && tags.value.length < 8) {
+    // Thẻ từ API sẽ có ID
+    tags.value.push({ id: selectedTag.id, name: selectedTag.name })
   }
 }
 
@@ -105,28 +145,32 @@ const handleUpload = async () => {
   formData.append('title', title.value)
   formData.append('categoryId', categoryId.value)
   formData.append('description', description.value)
-  formData.append('file', selectedFile.value)
+  formData.append('fileUrl', selectedFile.value)
 
-  // Xử lý tạm thời cho thumbnail (Vì UI chưa có nút upload ảnh bìa)
-  // Gửi một file rỗng hoặc file hiện tại để vượt qua @NotNull của Backend
-  formData.append('thumbnail', new Blob([''], { type: 'image/jpeg' }), 'dummy.jpg')
+  if (thumbnailFile.value) {
+    formData.append('thumbnail', thumbnailFile.value)
+  }
 
   // Gửi mảng tags lên backend (tên 'newTagNames' phải khớp với DTO)
   tags.value.forEach((tag) => {
-    formData.append('newTagNames', tag)
+    if (tag.id) {
+      // Nếu có ID -> Gửi vào existingTagIds
+      formData.append('existingTagIds', tag.id)
+    } else {
+      // Nếu không có ID -> Gửi vào newTagNames
+      formData.append('newTagNames', tag.name)
+    }
   })
 
   try {
-    const res = await authApis.post(endpoints['upload'](formData))
+    const res = await authApis.post(endpoints['upload'], formData)
 
     console.log('Upload thành công:', res.data)
     alert('Tải lên thành công!')
-    // Chuyển hướng về trang chi tiết tài liệu hoặc trang chủ
     router.push(`/documents/${res.data.id}`)
   } catch (error) {
     errorMessage.value = error.response?.data?.message || 'Có lỗi xảy ra khi upload!'
     console.error('Lỗi upload:', errorMessage.value)
-    uploadProgress.value = 0
   } finally {
     isUploading.value = false
   }
@@ -212,6 +256,48 @@ const handleUpload = async () => {
               </div>
             </div>
           </div>
+          <!-- KHUNG UPLOAD ẢNH BÌA (TÙY CHỌN) -->
+          <div class="panel mt-4">
+            <div class="panel-header flex-between">
+              <div class="panel-title">
+                <span class="material-symbols-outlined icon-sm text-blue">image</span>
+                Ảnh bìa tài liệu
+              </div>
+              <span class="helper-text">Tùy chọn</span>
+            </div>
+
+            <!-- Vùng chọn ảnh (khi chưa có ảnh) -->
+            <div
+              class="thumbnail-upload-zone"
+              v-if="!thumbnailPreview"
+              @click="triggerThumbnailInput"
+            >
+              <span class="material-symbols-outlined icon-large text-muted"
+                >add_photo_alternate</span
+              >
+              <p class="drop-subtitle mt-2" style="color: #1e293b; font-weight: 500">
+                Nhấn để chọn ảnh bìa
+              </p>
+              <p class="helper-text">Nếu để trống, hệ thống sẽ tự động tạo ảnh bìa</p>
+            </div>
+
+            <!-- Vùng hiển thị ảnh (khi đã chọn ảnh) -->
+            <div class="thumbnail-preview-zone" v-else>
+              <img :src="thumbnailPreview" alt="Thumbnail Preview" class="thumbnail-image" />
+              <button class="btn-icon btn-remove-thumb" @click.stop="removeThumbnail">
+                <span class="material-symbols-outlined">close</span>
+              </button>
+            </div>
+
+            <!-- Input file ẩn cho ảnh bìa -->
+            <input
+              type="file"
+              hidden
+              ref="thumbnailInputRef"
+              @change="handleThumbnailSelect"
+              accept="image/jpeg, image/png, image/jpg"
+            />
+          </div>
         </div>
 
         <!-- CỘT PHẢI: Thông tin chi tiết -->
@@ -252,13 +338,12 @@ const handleUpload = async () => {
             <div class="form-group">
               <div class="flex-between">
                 <label class="form-label">THẺ PHÂN LOẠI (TAGS)</label>
-                <span class="helper-text">Tối đa 8 thẻ</span>
               </div>
 
               <!-- Danh sách thẻ đã chọn -->
               <div class="tags-container" v-if="tags.length > 0">
                 <div class="tag-item" v-for="(tag, index) in tags" :key="index">
-                  {{ tag }}
+                  {{ tag.name }}
                   <span class="material-symbols-outlined icon-close" @click="removeTag(index)"
                     >close</span
                   >
@@ -279,28 +364,22 @@ const handleUpload = async () => {
                   class="form-control"
                   v-model="tagInput"
                   @keyup.enter="addTag"
-                  placeholder="# Nhập tên thẻ mới và nhấn Enter..."
+                  placeholder="Nhập tên thẻ mới"
                 />
                 <button class="btn-outline btn-add-tag" @click="addTag">
                   <span class="material-symbols-outlined icon-sm">add</span> Thêm thẻ
                 </button>
               </div>
-
-              <!-- Gợi ý thẻ -->
-              <div class="tag-suggestions">
-                <div class="suggestion-label">Gợi ý phổ biến:</div>
+              <div class="tag-suggestions" v-if="tagsList.length > 0">
+                <div class="suggestion-label">Chọn từ danh sách:</div>
                 <div class="suggestion-list">
-                  <button class="btn-suggestion" @click="addSuggestedTag('Y học lâm sàng')">
-                    + Y học lâm sàng
-                  </button>
-                  <button class="btn-suggestion" @click="addSuggestedTag('Deep Learning')">
-                    + Deep Learning
-                  </button>
-                  <button class="btn-suggestion" @click="addSuggestedTag('Luận văn 2026')">
-                    + Luận văn 2026
-                  </button>
-                  <button class="btn-suggestion" @click="addSuggestedTag('Khoa học dữ liệu')">
-                    + Khoa học dữ liệu
+                  <button
+                    v-for="tag in tagsList"
+                    :key="tag.id"
+                    class="btn-suggestion"
+                    @click="addSuggestedTag(tag)"
+                  >
+                    + {{ tag.name }}
                   </button>
                 </div>
               </div>

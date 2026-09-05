@@ -9,9 +9,11 @@ export const endpoints = {
   documents: '/documents',
   documentDetail: (id) => `/documents/${id}`,
   like: (id) => `/documents/${id}/like`,
-  bookmarked: (id) => `/documents/${id}/bookmark`,
-  upload: (formData) => `/documents/upload`,
+  upload: `/documents/upload`,
   categories: '/categories',
+  tags: '/tags',
+  collection: '/collection',
+  addOrRemoveDocument: (documentId) => `/collection/${documentId}`,
 }
 
 const Apis = axios.create({
