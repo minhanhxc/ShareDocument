@@ -4,9 +4,11 @@
  */
 package com.tma.sharedocument.mapper;
 
-import com.tma.sharedocument.dto.UserRequestDto;
+import com.tma.sharedocument.dto.AuthResponseDto;
+import com.tma.sharedocument.dto.RegisterRequestDto;
 import com.tma.sharedocument.dto.UserResponseDto;
 import com.tma.sharedocument.pojo.User;
+import lombok.Data;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -14,14 +16,17 @@ import org.mapstruct.Mapping;
  *
  * @author Minh Anh
  */
-@Mapper
+@Mapper(componentModel = "spring")
 public interface UserMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "userRole", ignore = true)
     @Mapping(target = "status", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
-    User toPojo(UserRequestDto u);
+    User toPojo(RegisterRequestDto u);
 
     UserResponseDto toDto(User u);
+    
+    @Mapping(target = "token", source = "token") 
+    AuthResponseDto toAuthResponseDto(User user, String token);
 }

@@ -4,83 +4,71 @@
  */
 package com.tma.sharedocument.service;
 
-import com.tma.sharedocument.dto.CollectionRequestDto;
+
+import com.tma.sharedocument.dto.DocumentResponseDto;
+import com.tma.sharedocument.mapper.DocumentMapper;
 import com.tma.sharedocument.pojo.Collection;
 import com.tma.sharedocument.pojo.Document;
 import com.tma.sharedocument.pojo.User;
 import com.tma.sharedocument.repository.CollectionRepository;
 import com.tma.sharedocument.repository.DocumentRepository;
 import com.tma.sharedocument.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.List;
+import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
  * @author ADMIN
  */
 @Service
+@RequiredArgsConstructor
 public class CollectionService {
 
-    @Autowired
-    private CollectionRepository collectionRepository;
-    @Autowired
-    private DocumentRepository documentRepository;
-    @Autowired
-    private UserRepository userRepository;
+    private final CollectionRepository collectionRepository;
+    private final DocumentRepository documentRepository;
+    private final UserRepository userRepository;
+    private final DocumentMapper documentMapper;
     
-    @Transactional
-    public Collection createCollection(CollectionRequestDto request, String username) {
+    
+    
+    public Collection getOrCreateCollection(String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Người dùng không tồn tại"));
-        Collection collection = new Collection();
-        collection.setName(request.getName());
-        collection.setUser(user);
-        
-        return collectionRepository.save(collection);
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy user"));
+ 
+        return collectionRepository.findByUserId(user.getId())
+                .orElseGet(() -> {
+                    Collection newCollection = new Collection();
+                    newCollection.setUser(user);
+                    return collectionRepository.save(newCollection);
+                });
     }
-    @Transactional
-    public void deleteCollection(Long collectionId, String username) {
-        Collection collection = collectionRepository.findById(collectionId)
-                .orElseThrow(() -> new RuntimeException("Mục yêu thích không tồn tại"));
-        if (!collection.getUser().getUsername().equals(username)) {
-            throw new RuntimeException("Bạn không có quyền xóa Mục yêu thích này");
-        }
-        collectionRepository.delete(collection);
-    }
-    @Transactional
-    public void addDocument(Long collectionId, Long documentId, String username) {
-        Collection collection = collectionRepository.findById(collectionId)
-                .orElseThrow(() -> new RuntimeException("Mục yêu thích không tồn tại"));
-
-        if (!collection.getUser().getUsername().equals(username)) {
-            throw new RuntimeException("Bạn không có quyền thao tác trên Mục yêu thích này");
-        }
-
+ 
+    public boolean toggleDocument(String username, Long documentId) {
+        Collection collection = getOrCreateCollection(username);
+ 
         Document document = documentRepository.findById(documentId)
-                .orElseThrow(() -> new RuntimeException("Tài liệu không tồn tại"));
-
-        boolean isAdded = collection.getDocuments().add(document);
-
-        if (!isAdded) {
-            throw new RuntimeException("Tài liệu này đã có trong Mục yêu thích rồi");
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy tài liệu"));
+ 
+        boolean alreadyExists = collection.getDocuments().contains(document);
+ 
+        if (alreadyExists) {
+            collection.getDocuments().remove(document);
+            collectionRepository.save(collection);
+            return false;
+        } else {
+            collection.getDocuments().add(document);
+            collectionRepository.save(collection);
+            return true;
         }
     }
-    @Transactional
-    public void removeDocument(Long collectionId, Long documentId, String username){
-        Collection collection = collectionRepository.findById(collectionId)
-                .orElseThrow(() -> new RuntimeException("Mục yêu thích không tồn tại"));
-
-        if (!collection.getUser().getUsername().equals(username)) {
-            throw new RuntimeException("Bạn không có quyền thao tác trên Mục yêu thích này");
-        }
-
-        Document document = documentRepository.findById(documentId)
-                .orElseThrow(() -> new RuntimeException("Tài liệu không tồn tại"));
-        
-        boolean isRemoved = collection.getDocuments().remove(document);
-        if (!isRemoved) {
-            throw new RuntimeException("Tài liệu này không có trong Mục yêu thích rồi");
-        }
+    
+    public List<DocumentResponseDto> getFavoriteDocuments(String username) {
+        Collection collection = getOrCreateCollection(username);
+ 
+        return collection.getDocuments().stream()
+                .map(documentMapper::toDto)
+                .collect(Collectors.toList());
     }
 }

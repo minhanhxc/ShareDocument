@@ -14,18 +14,17 @@ import org.mapstruct.Mapping;
  *
  * @author Minh Anh
  */
-@Mapper
+@Mapper(componentModel = "spring")
 public interface CommentMapper {
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "user", ignore = true)      
-    @Mapping(target = "document", ignore = true)  
+    @Mapping(target = "user", ignore = true)
+    @Mapping(target = "document", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     Comment toPojo(CommentRequestDto c);
-    
-    @Mapping(source = "user.id", target = "userId")
+
     @Mapping(source = "user.username", target = "username")
     @Mapping(source = "user.avatar", target = "avatar")
-
-    CommentResponseDto toDto(Comment c);
+    @Mapping(target = "fullName", expression = "java(comment.getUser().getHo() + \" \" + comment.getUser().getTen())")
+    CommentResponseDto toDto(Comment comment);
 }

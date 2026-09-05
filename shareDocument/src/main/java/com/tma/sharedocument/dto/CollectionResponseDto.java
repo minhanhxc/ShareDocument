@@ -11,16 +11,14 @@ package com.tma.sharedocument.dto;
 public class CollectionResponseDto {
     private Long id;
     private String name;
-    private Long userId;
     private Integer totalDocument;
 
     public CollectionResponseDto() {
     }
 
-    public CollectionResponseDto(Long id, String name, Long userId, Integer totalDocument) {
+    public CollectionResponseDto(Long id, String name, Integer totalDocument) {
         this.id = id;
         this.name = name;
-        this.userId = userId;
         this.totalDocument = totalDocument;
     }
 
@@ -54,19 +52,6 @@ public class CollectionResponseDto {
         this.name = name;
     }
 
-    /**
-     * @return the userId
-     */
-    public Long getUserId() {
-        return userId;
-    }
-
-    /**
-     * @param userId the userId to set
-     */
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
 
     /**
      * @return the totalDocument

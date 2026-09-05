@@ -11,22 +11,25 @@ package com.tma.sharedocument.dto;
 import java.time.LocalDateTime;
 
 public class CommentResponseDto {
-
     private Long id;
     private String content;
-    private Long userId;
-    private String username;
-    private String avatar;
     private LocalDateTime createdAt;
+    private String username;
+    private String fullName;
+    private String avatar;
 
-    public CommentResponseDto(Long id, String content, Long userId, String username, String avatar, LocalDateTime createdAt) {
+    public CommentResponseDto(Long id, String content, LocalDateTime createdAt, String username, String fullName, String avatar) {
         this.id = id;
         this.content = content;
-        this.userId = userId;
-        this.username = username;
-        this.avatar = avatar;
         this.createdAt = createdAt;
+        this.username = username;
+        this.fullName = fullName;
+        this.avatar = avatar;
     }
+
+    
+
+
 
     public CommentResponseDto() {
     }
@@ -59,19 +62,6 @@ public class CommentResponseDto {
         this.content = content;
     }
 
-    /**
-     * @return the userId
-     */
-    public Long getUserId() {
-        return userId;
-    }
-
-    /**
-     * @param userId the userId to set
-     */
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
 
     /**
      * @return the username
@@ -113,5 +103,19 @@ public class CommentResponseDto {
      */
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    /**
+     * @return the fullName
+     */
+    public String getFullName() {
+        return fullName;
+    }
+
+    /**
+     * @param fullName the fullName to set
+     */
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 }

@@ -9,15 +9,13 @@ package com.tma.sharedocument.dto;
  * @author Minh Anh
  */
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 
 
 
 public class CommentRequestDto {
 
-    public CommentRequestDto(String content, Long documentId) {
+    public CommentRequestDto(String content) {
         this.content = content;
-        this.documentId = documentId;
     }
 
     public CommentRequestDto() {
@@ -25,8 +23,7 @@ public class CommentRequestDto {
 
     @NotBlank(message = "Nội dung bình luận không được để trống")
     private String content;
-    @NotNull(message = "Phải chỉ định document")
-    private Long documentId;
+
 
     /**
      * @return the content
@@ -40,19 +37,5 @@ public class CommentRequestDto {
      */
     public void setContent(String content) {
         this.content = content;
-    }
-
-    /**
-     * @return the documentId
-     */
-    public Long getDocumentId() {
-        return documentId;
-    }
-
-    /**
-     * @param documentId the documentId to set
-     */
-    public void setDocumentId(Long documentId) {
-        this.documentId = documentId;
     }
 }
