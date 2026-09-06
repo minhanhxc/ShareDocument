@@ -4,6 +4,7 @@ import register from '../views/user/register.vue'
 import home from '../views/home.vue'
 import documentDetail from '../views/document/detail.vue'
 import upload from '../views/document/upload.vue'
+import profile from '../views/user/profile.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -17,11 +18,11 @@ const router = createRouter({
       name: 'register',
       component: register,
     },
-    // {
-    //   path: '/profile',
-    //   name: 'profile',
-    //   component: () => import('../views/ProfileView.vue'),
-    // },
+    {
+      path: '/profile',
+      name: 'profile',
+      component: profile,
+    },
     {
       path: '/',
       name: 'home',

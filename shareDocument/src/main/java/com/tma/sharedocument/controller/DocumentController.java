@@ -79,7 +79,7 @@ public class DocumentController {
         documentService.deleteDocument(documentId, userDetails.getUsername());
     }
 
-    @PostMapping("/{documentId}/like")
+    @PostMapping("/documents/{documentId}/like")
     public ResponseEntity<LikeStatusResponseDto> toggleLike(
             @PathVariable Long documentId,
             @AuthenticationPrincipal UserDetails userDetails) {
@@ -92,7 +92,8 @@ public class DocumentController {
 
         return ResponseEntity.ok(response);
     }
-
+    
+    
     @GetMapping("/categories")
     public ResponseEntity<List<Category>> listCate() {
         List<Category> response = documentService.listCate();

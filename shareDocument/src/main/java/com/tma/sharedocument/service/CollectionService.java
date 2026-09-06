@@ -16,6 +16,8 @@ import com.tma.sharedocument.repository.UserRepository;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 /**
@@ -64,11 +66,9 @@ public class CollectionService {
         }
     }
     
-    public List<DocumentResponseDto> getFavoriteDocuments(String username) {
+    public Page<DocumentResponseDto> getBookmarkedDocuments(String username, Pageable pageable) {
         Collection collection = getOrCreateCollection(username);
- 
-        return collection.getDocuments().stream()
-                .map(documentMapper::toDto)
-                .collect(Collectors.toList());
+        Page<Document> docsPage = collectionRepository.findBookmarkedDocumentsByUserId(collection.getUser().getId(), pageable);
+        return docsPage.map(documentMapper::toDto);
     }
 }

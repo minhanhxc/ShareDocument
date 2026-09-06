@@ -9,6 +9,8 @@ import com.tma.sharedocument.dto.CommentResponseDto;
 import com.tma.sharedocument.service.CommentService;
 import jakarta.validation.Valid;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -28,30 +31,29 @@ import org.springframework.web.bind.annotation.RestController;
  * @author ADMIN
  */
 @RestController
-@RequestMapping("/api") 
+@RequestMapping("/api")
+@RequiredArgsConstructor
 public class CommentController {
 
-    private CommentService commentService;
-
-
+    private final CommentService commentService;
 
     @GetMapping("/documents/{documentId}/comments")
-    public ResponseEntity<List<CommentResponseDto>> getCommentsByDocument(
-            @PathVariable Long documentId){
-        List<CommentResponseDto> comments = commentService.getCommentsByDocument(documentId);
-        return new ResponseEntity(comments, HttpStatus.OK);
+    public ResponseEntity<Page<CommentResponseDto>> listComments(
+            @PathVariable Long documentId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        Page<CommentResponseDto> response = commentService.listComments(documentId, page, size);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
-
 
     @PostMapping("/documents/{documentId}/comments")
     public ResponseEntity<CommentResponseDto> addComment(
             @PathVariable Long documentId,
-            @Valid @RequestBody CommentRequestDto request, 
+            @Valid @RequestBody CommentRequestDto request,
             @AuthenticationPrincipal UserDetails user) {
         CommentResponseDto newComment = commentService.addComment(documentId, request, user.getUsername());
-        return new ResponseEntity(newComment, HttpStatus.CREATED);
+        return new ResponseEntity<>(newComment, HttpStatus.CREATED);
     }
-
 
     @DeleteMapping("/comments/{commentId}")
     @ResponseStatus(HttpStatus.OK)

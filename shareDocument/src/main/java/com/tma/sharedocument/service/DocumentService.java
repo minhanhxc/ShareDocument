@@ -57,13 +57,17 @@ public class DocumentService {
     private final CollectionRepository collectionRepository;
     private final Cloudinary cloudinary;
 
-    public String uploadFile(MultipartFile file) throws IOException {
+    public String uploadFile(MultipartFile file) {
         if (file == null || file.isEmpty()) {
             return null;
         }
-        Map uploadResult = cloudinary.uploader().upload(file.getBytes(),
-                ObjectUtils.asMap("resource_type", "auto"));
-        return uploadResult.get("secure_url").toString();
+        try {
+            Map uploadResult = cloudinary.uploader().upload(file.getBytes(),
+                    ObjectUtils.asMap("resource_type", "auto"));
+            return uploadResult.get("secure_url").toString();
+        } catch (IOException e) {
+            throw new RuntimeException("Upload file thất bại: " + e.getMessage());
+        }
     }
 
     public String generateThumbnail(String fileUrl, String fileType) {
@@ -82,7 +86,7 @@ public class DocumentService {
         }
     }
 
-    public DocumentResponseDto createDocument(DocumentRequestDto dto, String username) throws IOException {
+    public DocumentResponseDto createDocument(DocumentRequestDto dto, String username) {
         Document document = documentMapper.toPojo(dto);
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User không tồn tại"));
@@ -172,6 +176,17 @@ public class DocumentService {
         }
         collectionRepository.removeDocumentFromAllCollections(doccumentId);
         documentRepository.delete(document);
+    }
+
+    public Page<DocumentResponseDto> getUserDocuments(String username, Pageable pageable) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng"));
+
+        // Lấy Page từ DB
+        Page<Document> documentPage = documentRepository.findByUser(user, pageable);
+
+        // Chuyển đổi Page<Document> thành Page<DocumentResponseDto>
+        return documentPage.map(documentMapper::toDto);
     }
 
     @Transactional

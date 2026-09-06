@@ -10,34 +10,17 @@ package com.tma.sharedocument.dto;
  */
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import lombok.Data;
 
 
 
-
+@Data
 public class CollectionRequestDto {
 
-    public CollectionRequestDto(String name) {
-        this.name = name;
-    }
-
-    public CollectionRequestDto() {
-    }
+   
 
     @NotBlank(message = "Tên bộ sưu tập không được để trống")
     @Size(max = 100)
     private String name;
 
-    /**
-     * @return the name
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * @param name the name to set
-     */
-    public void setName(String name) {
-        this.name = name;
-    }
 }

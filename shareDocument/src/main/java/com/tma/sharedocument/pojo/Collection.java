@@ -9,6 +9,7 @@ package com.tma.sharedocument.pojo;
  * @author Minh Anh
  */
 import jakarta.persistence.*;
+import java.util.HashSet;
 import java.util.Set;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -34,6 +35,6 @@ public class Collection {
             joinColumns = @JoinColumn(name = "collection_id"),
             inverseJoinColumns = @JoinColumn(name = "document_id")
     )
-    private Set<Document> documents;
+    private Set<Document> documents = new HashSet<>();
 
 }

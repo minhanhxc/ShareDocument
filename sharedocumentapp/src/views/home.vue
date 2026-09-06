@@ -83,9 +83,7 @@ onMounted(() => {
         <div class="section-header">
           <div>
             <h2 class="section-title">Trending Documents</h2>
-            <p class="section-subtitle">The most downloaded resources this week.</p>
           </div>
-          <RouterLink to="/documents" class="view-all-link"> View all trending → </RouterLink>
         </div>
 
         <div v-if="isLoading" class="text-center py-10 text-gray-500">Đang tải dữ liệu...</div>
@@ -309,13 +307,6 @@ onMounted(() => {
   padding: 64px 24px;
 }
 
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  margin-bottom: 32px;
-}
-
 .section-title {
   font-size: 26px;
   font-weight: 600;
@@ -326,13 +317,6 @@ onMounted(() => {
   font-size: 14.5px;
   color: #434655;
   margin: 0;
-}
-
-.view-all-link {
-  color: #004ac6;
-  font-weight: 500;
-  font-size: 14px;
-  text-decoration: none;
 }
 
 /* Bento Grid */

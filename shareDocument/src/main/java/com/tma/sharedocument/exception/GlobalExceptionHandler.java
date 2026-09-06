@@ -25,10 +25,7 @@ public class GlobalExceptionHandler {
         return buildError(HttpStatus.UNAUTHORIZED, "Sai username hoặc password");
     }
 
-    @ExceptionHandler(DisabledException.class)
-    public ResponseEntity<Map<String, Object>> handleDisabled(DisabledException ex) {
-        return buildError(HttpStatus.FORBIDDEN, "Tài khoản đã bị khóa");
-    }
+
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<Map<String, Object>> handleRuntime(RuntimeException ex) {

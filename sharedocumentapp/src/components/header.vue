@@ -56,7 +56,9 @@ const handleLogout = () => {
       <div class="actions-group">
         <!-- Đã đăng nhập -->
         <template v-if="authStore.isAuthenticated">
-          <span class="user-greeting">Hi, {{ authStore.user?.username }}</span>
+          <RouterLink to="/profile" class="user-greeting profile-link" title="Trang cá nhân">
+            Hi, {{ authStore.user?.username }}
+          </RouterLink>
           <RouterLink to="/documents/upload" class="btn-primary-pill">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -195,6 +197,16 @@ const handleLogout = () => {
   padding: 8px 12px;
 }
 
+.profile-link {
+  text-decoration: none;
+  color: inherit; /* Giữ nguyên màu chữ gốc */
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.profile-link:hover {
+  color: #0d6efd; /* Đổi màu khi di chuột vào */
+}
 .btn-primary-pill {
   display: inline-flex;
   align-items: center;
