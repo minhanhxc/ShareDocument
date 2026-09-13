@@ -30,6 +30,6 @@ public class DocumentDetailResponseDto {
     private Long totalLike;
     private boolean isLiked;
     private boolean isBookmarked;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDateTime createdAt;
 }

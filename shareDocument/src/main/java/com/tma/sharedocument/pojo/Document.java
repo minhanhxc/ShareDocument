@@ -9,16 +9,19 @@ package com.tma.sharedocument.pojo;
  * @author Minh Anh
  */
 import jakarta.persistence.*;
+import java.time.LocalDate;
 
-import java.time.LocalDateTime;
+
 import java.util.HashSet;
 import java.util.Set;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @NoArgsConstructor
-@Data
+@Getter
+@Setter
 @Table(name = "document")
 public class Document {
 
@@ -42,7 +45,7 @@ public class Document {
     private String fileType;
 
     @Column(name = "created_at")
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDate createdAt = LocalDate.now();
     
     @Column(name = "total_view")
     private Long totalView = 0L;

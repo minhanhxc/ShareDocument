@@ -8,7 +8,6 @@ package com.tma.sharedocument.dto;
  *
  * @author Minh Anh
  */
-import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -26,8 +25,6 @@ public class UserResponseDto {
     private String username;
     private String email;
     private String avatar;
-    private String userRole;
-    private Boolean status;
-    private LocalDateTime createdAt;
-
+    private Long totalUploaded;
+    private Long totalBookmarked;
 }

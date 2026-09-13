@@ -1,11 +1,12 @@
 <script setup>
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import Apis, { endpoints } from '@/configs/apis'
 import cookie from 'vue-cookies'
 import { useAuthStore } from '@/stores/auth'
 
 const authStore = useAuthStore()
+const route = useRoute()
 const router = useRouter()
 const username = ref('')
 const password = ref('')
@@ -31,7 +32,8 @@ const handleLogin = async () => {
       role: res.data.role,
     }
     authStore.setUser(userData)
-    router.push('/')
+    const redirectPath = route.query.redirect || '/'
+    router.push(redirectPath)
   } catch (error) {
     errorMessage.value = error.response?.data?.message || 'Không thể kết nối tới server'
     console.error('Login failed:', errorMessage.value)
@@ -72,9 +74,6 @@ const handleLogin = async () => {
             placeholder="••••••••"
             required
           />
-          <div class="label-row">
-            <RouterLink to="/forgot-password" class="forgot-link">Forgot Password?</RouterLink>
-          </div>
         </div>
 
         <button type="submit" class="btn-primary" :disabled="isLoading">

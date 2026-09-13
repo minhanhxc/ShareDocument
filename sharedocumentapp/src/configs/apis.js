@@ -14,6 +14,12 @@ export const endpoints = {
   tags: '/tags',
   collection: '/collection',
   addOrRemoveDocument: (documentId) => `/collection/${documentId}`,
+  comment: (documentId) => `/documents/${documentId}/comments`,
+  addComment: (documentId) => `/documents/${documentId}/comments`,
+  deleteComment: (commentId) => `/comments/${commentId}`,
+  myDocuments: '/profile/my-documents',
+  search: '/documents/search',
+  editDocuemnt: (documentId) => `/documents/edit/${documentId}`,
 }
 
 const Apis = axios.create({

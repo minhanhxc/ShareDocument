@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="vi" 
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/layout}">
+<head>
+    <title>Dashboard - Quản trị</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <h2 class="mb-4">Tổng quan hệ thống</h2>
+        
+        <div class="row">
+            <!-- Thẻ thống kê Người dùng -->
+            <div class="col-md-6 mb-4">
+                <div class="card border-0 shadow-sm bg-primary text-white p-3">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="bi bi-people"></i> Tổng số Người dùng</h5>
+                        <h2 class="fw-bold" th:text="${totalUsers}">0</h2>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Thẻ thống kê Tài liệu -->
+            <div class="col-md-6 mb-4">
+                <div class="card border-0 shadow-sm bg-success text-white p-3">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="bi bi-file-earmark-text"></i> Tổng số Tài liệu</h5>
+                        <h2 class="fw-bold" th:text="${totalDocs}">0</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

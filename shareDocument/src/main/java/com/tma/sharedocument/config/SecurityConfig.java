@@ -14,15 +14,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -48,7 +47,7 @@ public class SecurityConfig {
     private final JwtFilter jwtFilter;
     private final CustomAuthenticationEntryPoint authenticationEntryPoint;  // thêm
     private final CustomAccessDeniedHandler accessDeniedHandler;
-    
+
     @Value("${cloudinary.cloud-name}")
     private String cloudName;
 
@@ -57,7 +56,7 @@ public class SecurityConfig {
 
     @Value("${cloudinary.api-secret}")
     private String apiSecret;
-    
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -78,6 +77,33 @@ public class SecurityConfig {
     }
 
     @Bean
+    @Order(1) 
+    public SecurityFilterChain adminSecurityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .securityMatcher("/api/admin/**") 
+                .csrf(csrf -> csrf.disable()) 
+                .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/api/admin/login", "/admin/login-process", "/css/**", "/js/**").permitAll()
+                .requestMatchers("/admin/**").hasRole("ADMIN")
+                )
+                .formLogin(form -> form
+                .loginPage("/api/admin/login")
+                .loginProcessingUrl("/api/admin/login-process")
+                .defaultSuccessUrl("/api/admin/dashboard", true)
+                .failureUrl("/api/admin/login?error=true")
+                .permitAll()
+                )
+                .logout(logout -> logout
+                .logoutUrl("/api/admin/logout")
+                .logoutSuccessUrl("/api/admin/login?logout=true")
+                .invalidateHttpSession(true)
+                .deleteCookies("JSESSIONID")
+                );
+        return http.build();
+    }
+
+    @Bean
+    @Order(2)
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
@@ -87,7 +113,9 @@ public class SecurityConfig {
                 .requestMatchers("/api/login").permitAll()
                 .requestMatchers("/api/register").permitAll()
                 .requestMatchers("/api/documents").permitAll()
+                .requestMatchers("/api/documents/search").permitAll()
                 .requestMatchers("/api/documents/**").authenticated()
+                .requestMatchers("/admin/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
@@ -114,7 +142,7 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
-    
+
     @Bean
     public Cloudinary cloudinary() {
         Map<String, String> config = new HashMap<>();

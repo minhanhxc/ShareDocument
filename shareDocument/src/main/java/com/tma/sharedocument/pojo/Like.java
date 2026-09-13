@@ -11,7 +11,9 @@ package com.tma.sharedocument.pojo;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(
@@ -20,7 +22,8 @@ import lombok.NoArgsConstructor;
         @UniqueConstraint(columnNames = {"user_id", "document_id"})
     }
 )
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 public class Like {
 

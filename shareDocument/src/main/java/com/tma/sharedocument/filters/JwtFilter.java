@@ -39,8 +39,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
         String authHeader = request.getHeader("Authorization");
 
-        // Không có header hoặc sai định dạng -> bỏ qua, để request đi tiếp
-        // (SecurityConfig sẽ tự chặn nếu endpoint yêu cầu đăng nhập)
+
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
@@ -49,8 +48,7 @@ public class JwtFilter extends OncePerRequestFilter {
         String token = authHeader.substring(7); // bỏ "Bearer " (7 ký tự)
         String username = jwtUtil.extractUsername(token);
 
-        // Nếu lấy được username từ token, và chưa có ai được xác thực
-        // trong SecurityContext của request này
+
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
@@ -63,9 +61,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 authToken.setDetails(
                         new WebAuthenticationDetailsSource().buildDetails(request));
 
-                // Đây là bước quan trọng nhất: "đăng nhập" user này vào
-                // context của request hiện tại, Controller phía sau có thể
-                // lấy ra thông tin user qua SecurityContextHolder
+
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }
