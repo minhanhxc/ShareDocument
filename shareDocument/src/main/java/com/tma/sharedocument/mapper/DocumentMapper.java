@@ -7,6 +7,7 @@ package com.tma.sharedocument.mapper;
 import com.tma.sharedocument.dto.DocumentDetailResponseDto;
 import com.tma.sharedocument.dto.DocumentRequestDto;
 import com.tma.sharedocument.dto.DocumentResponseDto;
+import com.tma.sharedocument.elasticsearch.DocumentSearch;
 import com.tma.sharedocument.pojo.Document;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -45,4 +46,15 @@ public interface DocumentMapper {
     @Mapping(target = "liked", ignore = true)
     @Mapping(target = "bookmarked", ignore = true)
     DocumentDetailResponseDto toDetailDto(Document d);
+    
+    @Mapping(target = "uploaderId", source = "user.id")
+    @Mapping(target = "uploaderName", source = "user.username")
+    @Mapping(target = "categoryId", source = "category.id")
+    @Mapping(target = "categoryName", source = "category.name")
+    @Mapping(target = "tagNames", expression = "java(d.getTags().stream().map(tag -> tag.getName()).toList())")
+    @Mapping(target = "tagIds", expression = "java(d.getTags().stream().map(tag -> tag.getId()).toList())")
+    DocumentSearch toDocumentSearch(Document d);
+
+    // 2. Chuyển trực tiếp kết quả từ ES về DTO cho Frontend
+    DocumentResponseDto toDtoFromSearch(DocumentSearch ds);
 }

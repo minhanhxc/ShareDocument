@@ -5,53 +5,142 @@ import Apis, { authApis, endpoints } from '@/configs/apis'
 import Header from '@/components/header.vue'
 import Footer from '@/components/footer.vue'
 import { computed } from 'vue'
+import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
+import 'dayjs/locale/vi'
+
+dayjs.extend(relativeTime)
+dayjs.locale('vi')
 
 const route = useRoute()
+
 const documentData = ref({})
 const isLoading = ref(true)
-const errorMessage = ref('')
 const isLiked = ref(false)
 const isBookmarked = ref(false)
+
+const comments = ref([])
+const newComment = ref('')
+const isSubmittingComment = ref(false)
+const isLoadingComments = ref(false)
+
+const currentPage = ref(1)
+const totalPages = ref(0)
+const totalComments = ref(0)
+const pageSize = 10
+
 const fetchDocumentDetail = async () => {
   isLoading.value = true
-  errorMessage.value = ''
   try {
     const docId = route.params.id
-    const res = await authApis.get(endpoints['documentDetail'](docId))
+    const res = await authApis.get(endpoints.documentDetail(docId))
+
     documentData.value = res.data
-    isLiked.value = res.data.isLiked || false
-    isBookmarked.value = res.data.isBookmarked || false
+    isLiked.value = res.data.liked
+    isBookmarked.value = res.data.bookmarked
   } catch (error) {
-    errorMessage.value = error.response?.data?.message || 'Không thể kết nối tới server'
-    console.error('Lỗi khi tải dữ liệu:', errorMessage.value)
+    console.error('Lỗi khi tải dữ liệu:', error)
   } finally {
     isLoading.value = false
   }
 }
 
-const handleLike = async () => {
-  if (!documentData.value) return
-  errorMessage.value = ''
-  const previousState = isLiked.value
-  isLiked.value = !isLiked.value
-  documentData.value.likeCount = isLiked.value
-    ? (documentData.value.likeCount || 0) + 1
-    : Math.max(0, (documentData.value.likeCount || 0) - 1)
+const fetchComments = async (page = 0) => {
+  isLoadingComments.value = true
+  try {
+    const docId = route.params.id
+    const res = await authApis.get(endpoints.comment(docId), {
+      params: {
+        page: currentPage.value - 1,
+        size: pageSize,
+      },
+    })
+    comments.value = res.data.content
+    totalComments.value = res.data.totalElements
+    currentPage.value = res.data.number
+    totalPages.value = res.data.totalPages
+  } catch (error) {
+    console.error('Lỗi khi tải bình luận:', error)
+  } finally {
+    isLoadingComments.value = false
+  }
+}
+
+const changePage = (newPage) => {
+  if (newPage >= 1 && newPage <= totalPages.value) {
+    currentPage.value = newPage
+    fetchComments()
+  }
+}
+
+const handlePostComment = async () => {
+  if (!newComment.value.trim()) return
+  isSubmittingComment.value = true
 
   try {
     const docId = route.params.id
-    const res = await authApis.post(endpoints['like'](docId))
-    isLiked.value = res.data
-    console.log(`Đã ${isLiked.value ? 'thích' : 'bỏ thích'} tài liệu ${docId}`)
+    const payload = { content: newComment.value.trim() }
+    const res = await authApis.post(endpoints.addComment(docId), payload)
+
+    comments.value.unshift(res.data)
+    totalComments.value++
+    newComment.value = ''
+  } catch (error) {
+    alert(error.response?.data?.message || 'Không thể đăng bình luận')
+    console.error('Lỗi đăng bình luận:', error)
+  } finally {
+    isSubmittingComment.value = false
+  }
+}
+
+const handleDeleteComment = async (commentId) => {
+  if (!confirm('Bạn có chắc chắn muốn xóa bình luận này?')) return
+
+  try {
+    await authApis.delete(endpoints.deleteComment(commentId))
+    comments.value = comments.value.filter((c) => c.id !== commentId)
+    totalComments.value--
+  } catch (error) {
+    alert(error.response?.data?.message || 'Không thể xóa bình luận')
+    console.error('Lỗi xóa bình luận:', error)
+  }
+}
+
+const handleLike = async () => {
+  if (!documentData.value) return
+
+  const previousState = isLiked.value
+  isLiked.value = !isLiked.value
+
+  documentData.value.totalLike = isLiked.value
+    ? (documentData.value.totalLike || 0) + 1
+    : Math.max(0, (documentData.value.totalLike || 0) - 1)
+  console.log(isLiked.value)
+
+  try {
+    const docId = route.params.id
+    const res = await authApis.post(endpoints.like(docId))
+    isLiked.value = res.data.liked
   } catch (error) {
     isLiked.value = previousState
-    documentData.value.likeCount = isLiked.value
-      ? (documentData.value.likeCount || 0) + 1
-      : Math.max(0, (documentData.value.likeCount || 0) - 1)
-    errorMessage.value = error.response?.data?.message || 'Không thể kết nối tới server'
+    documentData.value.totalLike = isLiked.value
+      ? (documentData.value.totalLike || 0) + 1
+      : Math.max(0, (documentData.value.totalLike || 0) - 1)
 
-    console.error('Lỗi khi thích tài liệu:', errorMessage.value)
+    console.error('Lỗi khi thích tài liệu:', error)
   }
+}
+const handleDownload = (fileUrl) => {
+  if (!fileUrl) {
+    alert('Không có file để tải xuống.')
+    return
+  }
+  const link = document.createElement('a')
+  link.href = fileUrl
+  link.download = ''
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
 }
 
 const handleBookmark = async () => {
@@ -61,18 +150,22 @@ const handleBookmark = async () => {
 
   try {
     const docId = route.params.id
-    const res = await authApis.post(endpoints['bookmarked'](docId))
-    isBookmarked.value = res.data
-    console.log(`Đã ${isBookmarked.value ? 'lưu' : 'bỏ lưu'} tài liệu ${docId}`)
+    const res = await authApis.post(endpoints.addOrRemoveDocument(docId))
+    isBookmarked.value = res.data.bookmarked
   } catch (error) {
     isBookmarked.value = previousState
-    errorMessage.value = error.response?.data?.message || 'Không thể kết nối tới server'
-    console.error('Lỗi khi lưu tài liệu:', errorMessage.value)
+    console.error('Lỗi khi lưu tài liệu:', error)
   }
+}
+
+const formatTimeAgo = (dateString) => {
+  if (!dateString) return ''
+  return dayjs(dateString).fromNow()
 }
 
 onMounted(() => {
   fetchDocumentDetail()
+  fetchComments()
 })
 
 const isPdf = computed(() => {
@@ -84,22 +177,11 @@ const isOfficeFile = computed(() => {
   return ['DOCX', 'DOC', 'PPTX', 'PPT', 'XLSX', 'XLS'].includes(type)
 })
 
-// Tạo URL nhúng cho file Office thông qua Google Docs Viewer
 const googleDocsViewerUrl = computed(() => {
   if (!documentData.value?.fileUrl) return ''
-  // Bắt buộc phải encode URL của file
   const encodedUrl = encodeURIComponent(documentData.value.fileUrl)
   return `https://docs.google.com/gview?url=${encodedUrl}&embedded=true`
 })
-
-// --- PHẦN BÌNH LUẬN (Tạm giữ logic cũ chờ API bình luận) ---
-const newComment = ref('')
-const comments = ref([])
-
-const postComment = () => {
-  // Logic gọi API POST /comments sẽ viết ở đây sau
-  console.log('Post comment:', newComment.value)
-}
 </script>
 
 <template>
@@ -142,23 +224,35 @@ const postComment = () => {
           </div>
         </div>
 
-        <!-- Phần Bình luận (Di chuyển xuống dưới Iframe) -->
-        <div class="comments-section">
-          <h2 class="comments-title">Thảo luận ({{ comments?.length || 0 }})</h2>
+        <!-- Phần Bình luận -->
+        <div class="comments-section mt-4">
+          <h2 class="comments-title">Thảo luận ({{ totalComments || 0 }})</h2>
 
           <!-- Input Box -->
           <div class="comment-input-box">
-            <div class="user-avatar placeholder hide-mobile">
+            <!-- GỢI Ý: Lấy avatar từ AuthStore (nếu có) thay thế cho icon tĩnh này -->
+            <div
+              class="user-avatar placeholder hide-mobile"
+              style="overflow: hidden; display: flex; align-items: center; justify-content: center"
+            >
               <span class="material-symbols-outlined">person</span>
             </div>
+
             <div class="input-wrapper">
               <textarea
                 v-model="newComment"
                 class="comment-textarea"
-                placeholder="Thêm bình luận hoặc đặt câu hỏi..."
+                placeholder="Thêm bình luận..."
+                :disabled="isSubmittingComment"
               ></textarea>
-              <div class="btn-right-align">
-                <button @click="postComment" class="btn-primary btn-small">Đăng bình luận</button>
+              <div class="btn-right-align" style="margin-top: 8px; text-align: right">
+                <button
+                  @click="handlePostComment"
+                  class="btn-primary btn-small"
+                  :disabled="!newComment.trim() || isSubmittingComment"
+                >
+                  {{ isSubmittingComment ? 'Đang đăng...' : 'Đăng bình luận' }}
+                </button>
               </div>
             </div>
           </div>
@@ -166,19 +260,91 @@ const postComment = () => {
           <!-- Comment List -->
           <div class="comment-list">
             <div v-for="comment in comments" :key="comment.id" class="comment-item">
-              <div class="user-avatar placeholder">
-                <span class="material-symbols-outlined">person</span>
+              <!-- Avatar -->
+              <div
+                class="user-avatar"
+                :class="{ placeholder: !comment.avatar }"
+                style="
+                  width: 40px;
+                  height: 40px;
+                  flex-shrink: 0;
+                  border-radius: 50%;
+                  overflow: hidden;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                "
+              >
+                <img
+                  v-if="comment.avatar"
+                  :src="comment.avatar"
+                  alt="Avatar"
+                  class="avatar-img"
+                  style="width: 100%; height: 100%; object-fit: cover"
+                />
+                <span v-else class="material-symbols-outlined">person</span>
               </div>
+
               <div class="comment-body">
-                <div class="comment-header">
-                  <span class="comment-author">{{ comment.authorName }}</span>
-                  <span class="comment-time">{{ comment.createdAt }}</span>
+                <div class="comment-header flex-between">
+                  <div>
+                    <span class="comment-author">{{ comment.username }}</span>
+                    <span class="comment-time">{{ formatTimeAgo(comment.createdAt) }}</span>
+                  </div>
+                  <!-- Nút Xóa (Tạm thời hiển thị cho mọi comment) -->
+                  <button
+                    class="btn-icon text-muted"
+                    @click="handleDeleteComment(comment.id)"
+                    title="Xóa bình luận"
+                    style="border: none; background: none; cursor: pointer"
+                  >
+                    <span class="material-symbols-outlined" style="font-size: 18px">delete</span>
+                  </button>
                 </div>
-                <p class="comment-text">
-                  {{ comment.content }}
-                </p>
+                <p class="comment-text" style="white-space: pre-wrap">{{ comment.content }}</p>
               </div>
             </div>
+          </div>
+
+          <!-- Phân trang Comment -->
+          <div
+            class="pagination-wrapper mt-4 mb-4"
+            v-if="totalPages > 1"
+            style="display: flex; justify-content: center; gap: 8px"
+          >
+            <!-- SỬA TẠI ĐÂY 1: Đồng bộ tên hàm changePage và class active -->
+            <button
+              v-for="pageNum in totalPages"
+              :key="pageNum"
+              class="page-btn"
+              :class="{ active: currentPage === pageNum }"
+              @click="changePage(pageNum)"
+              style="
+                width: 32px;
+                height: 32px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border: 1px solid #e2e8f0;
+                background: white;
+                color: #475569;
+                border-radius: 6px;
+                cursor: pointer;
+                transition: all 0.2s;
+              "
+              onmouseover="
+                this.style.borderColor = '#0d6efd'
+                this.style.color = '#0d6efd'
+              "
+              onmouseout="
+                if (!this.classList.contains('active')) {
+                  this.style.borderColor = '#e2e8f0'
+                  this.style.color = '#475569'
+                }
+              "
+            >
+              {{ pageNum }}
+            </button>
           </div>
         </div>
       </div>
@@ -187,7 +353,6 @@ const postComment = () => {
       <div class="layout-right">
         <!-- KHUNG 1: Metadata & Hành động -->
         <div class="info-card">
-          <!-- Hàng 1: Tags -->
           <div class="card-tags">
             <span class="tag-primary">{{ documentData.fileType }}</span>
             <span v-for="tag in documentData.tagNames" :key="tag" class="tag-outline">
@@ -195,15 +360,12 @@ const postComment = () => {
             </span>
           </div>
 
-          <!-- Hàng 2: Title -->
           <h1 class="doc-title">{{ documentData.title }}</h1>
 
-          <!-- Hàng 3: Category -->
           <div class="doc-category">
             Danh mục: <strong>{{ documentData.categoryName }}</strong>
           </div>
 
-          <!-- Hàng 4: Stats (Thời gian, Lượt xem, Lượt thích) -->
           <div class="doc-stats">
             <div class="stat-item">
               <span class="material-symbols-outlined icon-sm">calendar_month</span>
@@ -211,18 +373,16 @@ const postComment = () => {
             </div>
             <div class="stat-item">
               <span class="material-symbols-outlined icon-sm">visibility</span>
-              {{ documentData.viewCount || 0 }}
+              {{ documentData.totalView || 0 }}
             </div>
           </div>
 
-          <!-- Hàng 5: Nút Download -->
-          <button class="btn-primary btn-download">
+          <button class="btn-primary btn-download" @click="handleDownload(documentData.fileUrl)">
             <span class="material-symbols-outlined">download</span>
             Tải xuống ngay
           </button>
 
           <div class="action-grid">
-            <!-- Nút Thích -->
             <button class="btn-outline" :class="{ 'active-btn': isLiked }" @click="handleLike">
               <span
                 class="material-symbols-outlined icon-md"
@@ -231,10 +391,9 @@ const postComment = () => {
               >
                 favorite
               </span>
-              {{ documentData.likeCount || 0 }} {{ isLiked ? 'Đã thích' : 'Thích' }}
+              {{ documentData.totalLike || 0 }} {{ isLiked ? 'Đã thích' : 'Thích' }}
             </button>
 
-            <!-- Nút Lưu -->
             <button
               class="btn-outline"
               :class="{ 'active-btn': isBookmarked }"
@@ -254,24 +413,34 @@ const postComment = () => {
 
         <!-- KHUNG 2: Description & Author -->
         <div class="info-card flex-col-gap">
-          <!-- Phần trên: Mô tả -->
           <div>
             <h3 class="section-title">Mô tả tài liệu</h3>
             <p class="desc-text">{{ documentData.description }}</p>
           </div>
-
-          <!-- Dấu gạch ngang kết thúc phần mô tả -->
           <hr class="divider" />
-
-          <!-- Phần dưới: Đăng tải bởi -->
           <div>
             <h3 class="section-title mb-3">Đăng tải</h3>
             <div class="author-info">
-              <!-- Avatar bên trái -->
-              <div class="author-avatar-placeholder">
-                <span class="material-symbols-outlined">person</span>
+              <!-- SỬA TẠI ĐÂY 2: Thay thế icon tĩnh bằng avatar động của Uploader -->
+              <div
+                class="author-avatar-placeholder"
+                style="
+                  overflow: hidden;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  border-radius: 50%;
+                "
+              >
+                <img
+                  v-if="documentData.uploaderAvatar"
+                  :src="documentData.uploaderAvatar"
+                  alt="Uploader Avatar"
+                  style="width: 100%; height: 100%; object-fit: cover"
+                />
+                <span v-else class="material-symbols-outlined">person</span>
               </div>
-              <!-- Tên bên phải -->
+
               <div>
                 <div class="author-name">{{ documentData.uploaderName }}</div>
               </div>

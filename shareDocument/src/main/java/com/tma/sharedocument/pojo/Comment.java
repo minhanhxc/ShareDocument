@@ -12,11 +12,14 @@ import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "comment")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 public class Comment {
 

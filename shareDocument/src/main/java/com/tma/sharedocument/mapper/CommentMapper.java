@@ -25,6 +25,5 @@ public interface CommentMapper {
 
     @Mapping(source = "user.username", target = "username")
     @Mapping(source = "user.avatar", target = "avatar")
-    @Mapping(target = "fullName", expression = "java(comment.getUser().getHo() + \" \" + comment.getUser().getTen())")
     CommentResponseDto toDto(Comment comment);
 }

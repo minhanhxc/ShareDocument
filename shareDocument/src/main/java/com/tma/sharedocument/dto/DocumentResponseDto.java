@@ -9,6 +9,7 @@ package com.tma.sharedocument.dto;
  * @author Minh Anh
  */
 import com.fasterxml.jackson.annotation.JsonFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -30,6 +31,6 @@ public class DocumentResponseDto {
     private Long totalView;
     private Long totalLike;
     @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDateTime createdAt;
+    private LocalDate createdAt;
 
 }

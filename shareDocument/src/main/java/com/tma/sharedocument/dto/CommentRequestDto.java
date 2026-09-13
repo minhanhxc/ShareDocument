@@ -9,33 +9,12 @@ package com.tma.sharedocument.dto;
  * @author Minh Anh
  */
 import jakarta.validation.constraints.NotBlank;
+import lombok.Data;
 
 
-
+@Data
 public class CommentRequestDto {
 
-    public CommentRequestDto(String content) {
-        this.content = content;
-    }
-
-    public CommentRequestDto() {
-    }
-
     @NotBlank(message = "Nội dung bình luận không được để trống")
-    private String content;
-
-
-    /**
-     * @return the content
-     */
-    public String getContent() {
-        return content;
-    }
-
-    /**
-     * @param content the content to set
-     */
-    public void setContent(String content) {
-        this.content = content;
-    }
+    private String content; 
 }

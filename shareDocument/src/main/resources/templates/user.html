@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<!--
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this template
+-->
+<html lang="vi" 
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/layout}"> <!-- Khai báo kế thừa layout gốc -->
+<head>
+    <title>Quản lý Người dùng</title>
+</head>
+<body>
+    <!-- NỘI DUNG CHÍNH ĐƯỢC BƠM VÀO LAYOUT GỐC -->
+    <div layout:fragment="content">
+        
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="h4 mb-0 text-gray-800">Danh sách Người dùng</h2>
+            <div class="input-group w-25">
+                <input type="text" class="form-control" placeholder="Tìm kiếm...">
+                <button class="btn btn-primary" type="button"><i class="bi bi-search"></i></button>
+            </div>
+        </div>
+
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Tên đăng nhập</th>
+                                <th>Họ và Tên</th>
+                                <th>Email</th>
+                                <th>Vai trò</th>
+                                <th>Trạng thái</th>
+                                <th class="text-center">Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Vòng lặp lấy dữ liệu từ Model -->
+                            <tr th:each="user : ${users}">
+                                <td th:text="${user.id}">1</td>
+                                <td th:text="${user.username}">username</td>
+                                <td th:text="${user.ho + ' ' + user.ten}">Nguyễn Văn A</td>
+                                <td th:text="${user.email}">email@example.com</td>
+                                <td>
+                                    <!-- Giả sử bạn có biến role hoặc isAdmin -->
+                                    <span class="badge bg-primary">Thành viên</span>
+                                </td>
+                                <td>
+                                    <!-- Giả sử bạn có biến isActive hoặc locked -->
+                                    <span class="badge bg-success">Hoạt động</span>
+                                </td>
+                                <td class="text-center">
+                                    <button class="btn btn-sm btn-outline-danger" title="Khóa tài khoản">
+                                        <i class="bi bi-lock-fill"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-info" title="Xem chi tiết">
+                                        <i class="bi bi-eye-fill"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            
+                            <!-- Hiển thị khi danh sách trống -->
+                            <tr th:if="${#lists.isEmpty(users)}">
+                                <td colspan="7" class="text-center py-4 text-muted">
+                                    Không có người dùng nào.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Phân trang cơ bản -->
+        <nav class="mt-4" th:if="${totalPages > 1}">
+            <ul class="pagination justify-content-center">
+                <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                    <a class="page-link" th:href="@{/admin/users(page=${currentPage - 1})}">Trước</a>
+                </li>
+                <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}" 
+                    th:classappend="${currentPage == i} ? 'active'">
+                    <a class="page-link" th:href="@{/admin/users(page=${i})}" th:text="${i + 1}">1</a>
+                </li>
+                <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                    <a class="page-link" th:href="@{/admin/users(page=${currentPage + 1})}">Sau</a>
+                </li>
+            </ul>
+        </nav>
+
+    </div>
+</body>
+</html>

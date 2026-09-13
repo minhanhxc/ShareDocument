@@ -9,6 +9,8 @@ import com.cloudinary.utils.ObjectUtils;
 import com.tma.sharedocument.dto.DocumentDetailResponseDto;
 import com.tma.sharedocument.dto.DocumentRequestDto;
 import com.tma.sharedocument.dto.DocumentResponseDto;
+import com.tma.sharedocument.elasticsearch.DocumentSearch;
+import com.tma.sharedocument.elasticsearch.DocumentSearchService;
 import com.tma.sharedocument.mapper.DocumentMapper;
 import com.tma.sharedocument.pojo.Category;
 import com.tma.sharedocument.pojo.Document;
@@ -56,14 +58,19 @@ public class DocumentService {
     private final LikeRepository likeRepository;
     private final CollectionRepository collectionRepository;
     private final Cloudinary cloudinary;
+    private final DocumentSearchService documentSearchService;
 
-    public String uploadFile(MultipartFile file) throws IOException {
+    public String uploadFile(MultipartFile file) {
         if (file == null || file.isEmpty()) {
             return null;
         }
-        Map uploadResult = cloudinary.uploader().upload(file.getBytes(),
-                ObjectUtils.asMap("resource_type", "auto"));
-        return uploadResult.get("secure_url").toString();
+        try {
+            Map uploadResult = cloudinary.uploader().upload(file.getBytes(),
+                    ObjectUtils.asMap("resource_type", "auto"));
+            return uploadResult.get("secure_url").toString();
+        } catch (IOException e) {
+            throw new RuntimeException("Upload file thất bại: " + e.getMessage());
+        }
     }
 
     public String generateThumbnail(String fileUrl, String fileType) {
@@ -82,7 +89,8 @@ public class DocumentService {
         }
     }
 
-    public DocumentResponseDto createDocument(DocumentRequestDto dto, String username) throws IOException {
+    @Transactional
+    public DocumentResponseDto createDocument(DocumentRequestDto dto, String username) {
         Document document = documentMapper.toPojo(dto);
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User không tồn tại"));
@@ -95,6 +103,7 @@ public class DocumentService {
 
         String fileType = StringUtils.getFilenameExtension(dto.getFileUrl().getOriginalFilename());
         document.setFileType(fileType);
+
         String thumbnail = "";
         if (dto.getThumbnail() == null) {
             thumbnail = this.generateThumbnail(fileUrl, fileType);
@@ -130,18 +139,78 @@ public class DocumentService {
 
         document.setTags(documentTags);
         documentRepository.save(document);
+        DocumentSearch search = documentMapper.toDocumentSearch(document);
+        documentSearchService.index(search);
         return documentMapper.toDto(document);
     }
 
-    public Page<DocumentResponseDto> listDocument(String keyword, Long categoryId,
-            Long tagId, int page, int size, String sortBy) {
-
-        String sortField = "views".equalsIgnoreCase(sortBy) ? "totalView" : "createdAt";
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sortField).descending());
+    public Page<DocumentResponseDto> bannerDocument(String keyword, Long categoryId,
+            Long tagId, Pageable pageable) {
 
         Page<Document> documentPage = documentRepository.findAll(keyword, categoryId, tagId, pageable);
 
         return documentPage.map(documentMapper::toDto);
+    }
+
+    @Transactional
+    public DocumentResponseDto updateDocument(Long documentId, String username, String title, Long categoryId,
+            String description, List<Long> existingTagIds,
+            List<String> newTagNames, MultipartFile file, MultipartFile thumbnail) {
+
+        Document document = documentRepository.findById(documentId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy tài liệu"));
+
+        if (!document.getUser().getUsername().equals(username)) {
+            throw new RuntimeException("Bạn không có quyền chỉnh sửa tài liệu này");
+        }
+
+        document.setTitle(title);
+        document.setDescription(description);
+
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy danh mục"));
+        document.setCategory(category);
+
+        document.getTags().clear();
+
+        if (existingTagIds != null && !existingTagIds.isEmpty()) {
+            List<Tag> existingTags = tagRepository.findAllById(existingTagIds);
+            document.getTags().addAll(existingTags);
+        }
+
+        if (newTagNames != null && !newTagNames.isEmpty()) {
+            for (String tagName : newTagNames) {
+                Tag tag = tagRepository.findByName(tagName)
+                        .orElseGet(() -> tagRepository.save(new Tag(tagName)));
+                document.getTags().add(tag);
+            }
+        }
+        String fileUrl = null;
+        String fileType = null;
+        if (file != null && !file.isEmpty()) {
+            fileUrl = this.uploadFile(file);
+            document.setFileUrl(fileUrl);
+            fileType = StringUtils.getFilenameExtension(file.getOriginalFilename());
+            document.setFileType(fileType);
+            String thumbnailUrl = null;
+            if (thumbnail != null && !thumbnail.isEmpty()) {
+                thumbnailUrl = this.uploadFile(thumbnail);
+                document.setThumbnail(thumbnailUrl);
+
+            } else {
+                thumbnailUrl = this.generateThumbnail(fileUrl, fileType);
+                document.setThumbnail(thumbnailUrl);
+            }
+        }
+
+        // 5. Lưu vào MySQL
+        Document savedDocument = documentRepository.save(document);
+
+        DocumentSearch documentSearch = documentMapper.toDocumentSearch(savedDocument);
+
+        documentSearchService.index(documentSearch);
+
+        return documentMapper.toDto(savedDocument);
     }
 
     public DocumentDetailResponseDto detailDocument(Long documentId, String username) {
@@ -171,7 +240,19 @@ public class DocumentService {
             throw new RuntimeException("Bạn không có quyền xóa tài liệu");
         }
         collectionRepository.removeDocumentFromAllCollections(doccumentId);
+        documentSearchService.delete(doccumentId);
         documentRepository.delete(document);
+    }
+
+    public Page<DocumentResponseDto> getUserDocuments(String username, Pageable pageable) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng"));
+
+        // Lấy Page từ DB
+        Page<Document> documentPage = documentRepository.findByUser(user, pageable);
+
+        // Chuyển đổi Page<Document> thành Page<DocumentResponseDto>
+        return documentPage.map(documentMapper::toDto);
     }
 
     @Transactional

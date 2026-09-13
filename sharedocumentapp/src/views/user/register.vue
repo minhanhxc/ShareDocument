@@ -43,12 +43,15 @@ const handleRegister = async () => {
     formData.append('username', username.value)
     formData.append('email', email.value)
     formData.append('password', password.value)
-    formData.append('avatar', avatarFile.value)
     if (avatarFile.value) {
       formData.append('avatar', avatarFile.value)
     }
 
-    const res = await Apis.post(endpoints['register'], formData)
+    const res = await Apis.post(endpoints['register'], formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    })
 
     alert('Đăng ký tài khoản thành công! Vui lòng đăng nhập.')
     router.push('/login')
